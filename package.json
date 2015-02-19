@@ -1,0 +1,12 @@
+{
+  "name"         : "lsf-scraper",
+  "version"      : "0.0.1",
+  "description"  : "scrape the lsf to collect curses with room and time.",
+  "main"         : "server.js",
+  "author"       : "theJetlag",
+  "dependencies" : {
+    "express"    : "latest",
+    "request"    : "latest",
+    "cheerio"    : "latest"
+  }
+}
