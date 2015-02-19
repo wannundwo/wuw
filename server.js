@@ -20,8 +20,9 @@ app.get('/scrape', function(req, res){
       var headerRow = $('th.plan_rahmen').closest('table').children('tr').first();
       headerRow.find('th').each(function(index) {
         var day = $(this).text();
-        day = day.replace(/ /g, '') // remove that whitespace
-        day = day.replace('\n', '')
+        day = day.replace(/ /g, ''); // remove that whitespace
+        day = day.replace(/\n/g, ' ');
+        day = day.trim();
         days.push(day);
       });
 
@@ -42,18 +43,13 @@ app.get('/scrape', function(req, res){
           // name and location are urls, so find them by "a"
           $(this).find('a').each(function(kindex){
             if (kindex == 0) {
-              var lectureName = $(this).attr('title');
-              lectureName = lectureName.replace(/ /g, '');
-              lectureName = lectureName.replace('\n', '');
-              lectureName = lectureName.replace('\t', '');
-              newLecture.lectureName = lectureName;
+              newLecture.lectureName = $(this).attr('title');
             } else if (kindex == 1) {
               newLecture.room = $(this).text();
             }
           });
 
           // add lecture to the lecture list of this week
-          //lecturesThisWeek.push(newLecture);
           lecturesThisWeek.push(newLecture);
         });
       });
