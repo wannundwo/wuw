@@ -51,9 +51,11 @@ app.get('/scrape', function(req, res){
           firstTimeInThisRow = false;
         }
         prevRowIndex = rowIndex;
+        var lectureDate = days[columnIndex-dateOffset];
 
-        // in this Lecture are Groups, i.e IF3_4 or IL (we had this in DSA or Theo)
+        // in this lecture could be many groups, i.e IF3_4 or IL (we had this in DSA or Theo)
         // we create a lecture for every group
+        var lecture = $(this);
         lecture.find('table').each(function(jindex){
           var newLecture = {};
           newLecture.date = lectureDate;
@@ -61,23 +63,39 @@ app.get('/scrape', function(req, res){
           // name and location are urls, so find them by "a"
           $(this).find('a').each(function(kindex){
             if (kindex == 0) {
-              newLecture.lectureName = $(this).attr('title');
+              newLecture.fullLectureName = $(this).attr('title');
             } else if (kindex == 1) {
               newLecture.room = $(this).text();
             }
           });
 
+          // query time
+          $(this).find('td.notiz').each(function(kindex){
+            if (kindex == 0) {
+              var time = $(this).text();
+              time = time.replace(/ /g, '');
+              time = time.replace(/\n/g, '');
+              newLecture.timeSpan = time;
+            }
+          });
+
+          // extract group from the name
+          newLecture.group = newLecture.fullLectureName.split(' ')[0];
+
+          // extract short lecture name
+          var shortLectureNameParts = newLecture.fullLectureName.split(' ');
+          shortLectureNameParts.splice(0,1);
+          newLecture.shortLectureName = shortLectureNameParts.join(" ");
+
           // add lecture to the lecture list of this week
           lecturesThisWeek.push(newLecture);
         });
       });
-
+      // write prettfied JSON
       res.write(JSON.stringify(lecturesThisWeek, null, 2));
       res.end();
     }
   });
-
-
 })
 
 app.listen('8081')
