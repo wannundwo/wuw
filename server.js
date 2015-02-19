@@ -30,7 +30,7 @@ app.get('/scrape', function(req, res){
 
         // get the column number of this td and define the date
         var columnIndex = $(this).parent().children().index($(this));
-        var lectureDate = days[columnIndex];
+        var lectureDate = days[columnIndex-2];
         var lecture = $(this);
 
         // in this Lecture are Groups, i.e IF3_4 or IL (we had this in DSA or Theo)
