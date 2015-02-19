@@ -26,13 +26,31 @@ app.get('/scrape', function(req, res){
         days.push(day);
       });
 
-      // plan2 & plan22 are our elements, where the lectures are stored
+      // td.plan2 and td.plan22 are our lecture elements
+      var prevRowIndex = -1;
+      var newRow = true;
+      var dateOffset = 0;
       $('td.plan2, td.plan22').each(function(index){
 
-        // get the column number of this td and define the date
+        // Whats going on here? We look in which column is this lecture,
+        // then we go up and pull the date from the column header. There could
+        // be an offset which is caused by "Zeit"-column. We find this offset
+        // and respect it when pulling the date from the header.
+        // This is very specific to the LSF HTML sctructure,
+        // have a look at the LSF table DOM for a better understanding.
         var columnIndex = $(this).parent().children().index($(this));
-        var lectureDate = days[columnIndex-2];
-        var lecture = $(this);
+        var rowIndex = $(this).parent().parent().children().index($(this).parent());
+        if (prevRowIndex == rowIndex) {
+          newRow = false;
+        } else {
+          newRow = true;
+        }
+
+        if (newRow) {
+          dateOffset = $(this).prevAll().length;
+          firstTimeInThisRow = false;
+        }
+        prevRowIndex = rowIndex;
 
         // in this Lecture are Groups, i.e IF3_4 or IL (we had this in DSA or Theo)
         // we create a lecture for every group
