@@ -7,6 +7,9 @@
   "dependencies" : {
     "express"    : "latest",
     "request"    : "latest",
-    "cheerio"    : "latest"
+    "cheerio"    : "latest",
+    "body-parser": "latest",
+    "mongoose"   : "latest",
+    "morgan"     : "latest"
   }
 }
