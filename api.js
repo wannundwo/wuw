@@ -148,7 +148,7 @@ router.route("/deadlines/:deadline_id")
     .delete(function(req, res) {
         Deadline.remove({
             _id: req.params.deadline_id
-        }, function(err, deadline) {
+        }, function(err) {
             if (err) { res.send(err); }
             res.json({ message: "Deadline successfully deleted" });
         });
