@@ -38,13 +38,15 @@ var LectureSchema = new mongoose.Schema({
     endTime: Date,
     group: String
 });
-var Lecture = lectureCon.model("Lecture", LectureSchema);
-
 var DeadlineSchema = new mongoose.Schema({
     deadline: Date,
+    createDate: { type: Date, default: Date.now },
     shortLectureName: String,
     group: String
 });
+
+// create models from our schemas
+var Lecture = lectureCon.model("Lecture", LectureSchema);
 var Deadline = deadlineCon.model("Deadline", DeadlineSchema);
 
 
