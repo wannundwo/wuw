@@ -40,7 +40,6 @@ var LectureSchema = new mongoose.Schema({
 });
 var DeadlineSchema = new mongoose.Schema({
     deadline: Date,
-    createDate: { type: Date, default: Date.now },
     shortLectureName: String,
     group: String
 });
