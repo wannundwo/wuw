@@ -5,7 +5,9 @@ var cheerio = require('cheerio');
 var app     = express();
 
 app.get('/scrape', function(req, res){
+  // just a static test url, later the client will send a week and a year
   url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=3_2015&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=";
+
   request(url, function(error, response, html) {
     if(!error) {
       var table = null;
@@ -17,7 +19,7 @@ app.get('/scrape', function(req, res){
       // load days before we cut of td.plan_rahmen stuff
       days = getDaysInThisWeek($);
 
-      // remove td.plan rahmen from the table
+      // remove td.plan rahmen from the table, this removes a lot of trouble
       table = $('th.plan_rahmen').closest('table');
       table.find('.plan_rahmen').remove();
 
@@ -36,8 +38,6 @@ app.get('/scrape', function(req, res){
       // iterate over each row and each cell
       rows.each(function(i) {
         var cells = $(this).children('td:not(:first-child)');
-
-        var buildedRow = [];
         var cellsArray = [];
         cells.each(function(j) {
           cellsArray.push($(this));
@@ -48,10 +48,10 @@ app.get('/scrape', function(req, res){
             // here must be a td element
 
             var currCell = cellsArray[0];
-            cellsArray.shift(); // removes the first element
+            cellsArray.shift(); // removes the first element, its a pseudo queue
 
             if (currCell.attr('class').indexOf('plan1') > -1) {
-              buildedRow.push(null); // no lecture here
+              // no lecture here
             } else if (currCell.attr('class').indexOf('plan2') > -1) { // here we have a lecture
               // now mark the whole rowspan down as the same lecture
               var rowspan = currCell.attr('rowspan');
@@ -61,16 +61,15 @@ app.get('/scrape', function(req, res){
 
               /******** PARSE THE LECURE TD *********/
               var moreLectures = parseLecturesFromHtml(currCell, days, j);
-              Array.prototype.push.apply(lectures, moreLectures);
-              buildedRow.push(currCell);
+              Array.prototype.push.apply(lectures, moreLectures); // join two arrays, the js way ¯\_(ツ)_/¯
             }
 
           } else { // here is no td, because a lecture from above rowspans until here
-            buildedRow.push(null);
+
           }
 
         }
-        //outputAsTable(timeTableGrid, i);
+        //outputAsTable(timeTableGrid, i); // we keep this comment as an debug toggle
       });
 
       res.write(JSON.stringify(lectures, null, 2));
@@ -85,7 +84,6 @@ var parseLecturesFromHtml = function(html, days, dayPos) {
 
   // there could be more then one groups in this lecture,
   // we create a lecture for every group
-
   html.find('table').each(function(i) {
     var lecture = {};
     lecture.lsfDate = days[dayPos];
@@ -122,7 +120,7 @@ var getDaysInThisWeek = function($) {
   var headerRow = $('th.plan_rahmen').closest('table').children('tr').first();
   headerRow.find('th').each(function(index) {
     var day = $(this).text();
-    day = day.replace(/ /g, ''); // remove that whitespace
+    day = day.replace(/ /g, '');
     day = day.replace(/\n/g, ' ');
     day = day.trim();
     days.push(day);
