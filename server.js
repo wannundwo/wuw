@@ -35,7 +35,6 @@ app.get('/scrape', function(req, res){
 
       // iterate over each row and each cell
       rows.each(function(i) {
-        console.log('########### ROW ' + i + '#############')
         var cells = $(this).children('td:not(:first-child)');
 
         var buildedRow = [];
@@ -61,14 +60,8 @@ app.get('/scrape', function(req, res){
               }
 
               /******** PARSE THE LECURE TD *********/
-              console.log("FOUND A LECTURE");
-              var lecture = {};
-              lecture.lsfDate = days[j];
-              lecture.lsfTime = trimProperty(currCell.find('td.notiz').first().text());
-              lecture.lsfName = currCell.find('a').first().attr('title');
-              lecture.lsfRoom = currCell.find('td.notiz a').first().text();
-              lectures.push(lecture);
-
+              var moreLectures = parseLecturesFromHtml(currCell, days, j);
+              Array.prototype.push.apply(lectures, moreLectures);
               buildedRow.push(currCell);
             }
 
@@ -85,6 +78,24 @@ app.get('/scrape', function(req, res){
     }
   });
 });
+
+var parseLecturesFromHtml = function(html, days, dayPos) {
+  var lectures = [];
+  var $ = cheerio.load(html);
+
+  // there could be more then one groups in this lecture,
+  // we create a lecture for every group
+
+  html.find('table').each(function(i) {
+    var lecture = {};
+    lecture.lsfDate = days[dayPos];
+    lecture.lsfTime = trimProperty($(this).find('td.notiz').first().text());
+    lecture.lsfName = $(this).find('a').first().attr('title');
+    lecture.lsfRoom = $(this).find('td.notiz a').first().text();
+    lectures.push(lecture);
+  });
+  return lectures;
+}
 
 var trimProperty = function(s) {
   s = s.replace(/ /g, ''); // remove that whitespace
