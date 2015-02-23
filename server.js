@@ -5,98 +5,119 @@ var cheerio = require('cheerio');
 var app     = express();
 
 app.get('/scrape', function(req, res){
-
-  url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=3_2015&act=stg&pool=stg&show=plan&P.vx=lang&fil=plu&P.subc=plan";
+  url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=3_2015&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=";
   request(url, function(error, response, html) {
     if(!error) {
-      console.log("HTML loaded without errors");
-
-      /*********** PARSING ***********/
+      var table = null;
+      var days = [];
+      var timeTableGrid = [];
+      var lectures = [];
       var $ = cheerio.load(html);
-      var days = []; // here we want so save the days of this week
-      var lecturesThisWeek = [];
 
-      // find the days (Mo, Die, Mi, ...) in the header
-      var headerRow = $('th.plan_rahmen').closest('table').children('tr').first();
-      headerRow.find('th').each(function(index) {
-        var day = $(this).text();
-        day = day.replace(/ /g, ''); // remove that whitespace
-        day = day.replace(/\n/g, ' ');
-        day = day.trim();
-        days.push(day);
-      });
+      // load days before we cut of td.plan_rahmen stuff
+      days = getDaysInThisWeek($);
 
-      // td.plan2 and td.plan22 are our lecture elements
-      var prevRowIndex = -1;
-      var newRow = true;
-      var dateOffset = 0;
-      $('td.plan2, td.plan22').each(function(index){
+      // remove td.plan rahmen from the table
+      table = $('th.plan_rahmen').closest('table');
+      table.find('.plan_rahmen').remove();
 
-        // Whats going on here? We look in which column is this lecture,
-        // then we go up and pull the date from the column header. There could
-        // be an offset which is caused by "Zeit"-column. We find this offset
-        // and respect it when pulling the date from the header.
-        // This is very specific to the LSF HTML sctructure,
-        // have a look at the LSF table DOM for a better understanding.
-        var columnIndex = $(this).parent().children().index($(this));
-        var rowIndex = $(this).parent().parent().children().index($(this).parent());
-        if (prevRowIndex == rowIndex) {
-          newRow = false;
-        } else {
-          newRow = true;
+      // lets parse
+      // get all the rows of the timetable (except the header (days) row)
+      var rows = table.children('tr:not(:first-child)');
+
+      // create and prefill the grid, which holds our whole timetable
+      for (var i = 0; i < rows.length; i++) {     // rows
+        timeTableGrid[i] = new Array(days.length);
+        for (var j = 0; j < days.length; j++) {   // columns
+          timeTableGrid[i][j] = ".";
         }
+      }
 
-        if (newRow) {
-          dateOffset = $(this).prevAll().length;
-          firstTimeInThisRow = false;
-        }
-        prevRowIndex = rowIndex;
-        var lectureDate = days[columnIndex-dateOffset];
+      // iterate over each row and each cell
+      rows.each(function(i) {
+        console.log('########### ROW ' + i + '#############')
+        var cells = $(this).children('td:not(:first-child)');
 
-        // in this lecture could be many groups, i.e IF3_4 or IL (we had this in DSA or Theo)
-        // we create a lecture for every group
-        var lecture = $(this);
-        lecture.find('table').each(function(jindex){
-          var newLecture = {};
-          newLecture.date = lectureDate;
-
-          // name and location are urls, so find them by "a"
-          $(this).find('a').each(function(kindex){
-            if (kindex == 0) {
-              newLecture.fullLectureName = $(this).attr('title');
-            } else if (kindex == 1) {
-              newLecture.room = $(this).text();
-            }
-          });
-
-          // query time
-          $(this).find('td.notiz').each(function(kindex){
-            if (kindex == 0) {
-              var time = $(this).text();
-              time = time.replace(/ /g, '');
-              time = time.replace(/\n/g, '');
-              newLecture.timeSpan = time;
-            }
-          });
-
-          // extract group from the name
-          newLecture.group = newLecture.fullLectureName.split(' ')[0];
-
-          // extract short lecture name
-          var shortLectureNameParts = newLecture.fullLectureName.split(' ');
-          shortLectureNameParts.splice(0,1);
-          newLecture.shortLectureName = shortLectureNameParts.join(" ");
-
-          // add lecture to the lecture list of this week
-          lecturesThisWeek.push(newLecture);
+        var buildedRow = [];
+        var cellsArray = [];
+        cells.each(function(j) {
+          cellsArray.push($(this));
         });
+
+        for (var j = 0; j < days.length; j++) {
+          if (timeTableGrid[i][j] == ".") {
+            // here must be a td element
+
+            var currCell = cellsArray[0];
+            cellsArray.shift(); // removes the first element
+
+            if (currCell.attr('class').indexOf('plan1') > -1) {
+              buildedRow.push(null); // no lecture here
+            } else if (currCell.attr('class').indexOf('plan2') > -1) { // here we have a lecture
+              // now mark the whole rowspan down as the same lecture
+              var rowspan = currCell.attr('rowspan');
+              for (var k = 0; k < rowspan; k++) {
+                timeTableGrid[i+k][j] = j;
+              }
+
+              /******** PARSE THE LECURE TD *********/
+              console.log("FOUND A LECTURE");
+              var lecture = {};
+              lecture.lsfDate = days[j];
+              lecture.lsfTime = trimProperty(currCell.find('td.notiz').first().text());
+              lecture.lsfName = currCell.find('a').first().attr('title');
+              lecture.lsfRoom = currCell.find('td.notiz a').first().text();
+              lectures.push(lecture);
+
+              buildedRow.push(currCell);
+            }
+
+          } else { // here is no td, because a lecture from above rowspans until here
+            buildedRow.push(null);
+          }
+
+        }
+        //outputAsTable(timeTableGrid, i);
       });
-      // write prettfied JSON
-      res.write(JSON.stringify(lecturesThisWeek, null, 2));
+
+      res.write(JSON.stringify(lectures, null, 2));
       res.end();
     }
   });
-})
+});
+
+var trimProperty = function(s) {
+  s = s.replace(/ /g, ''); // remove that whitespace
+  s = s.replace(/\n/g, ' ');
+  s = s.trim();
+  return s;
+}
+
+var outputAsTable = function(timeTableGrid, iteration) {
+  for (var i = 0; i < timeTableGrid.length; i++) {
+    var row = timeTableGrid[i];
+    process.stdout.write(iteration + ". ROW: " + i + ":\t");
+
+    for (var j = 0; j < row.length; j++) {
+      process.stdout.write(row[j] + "  ");
+    }
+
+    process.stdout.write("\n");
+  }
+}
+
+var getDaysInThisWeek = function($) {
+  var days = [];
+  var headerRow = $('th.plan_rahmen').closest('table').children('tr').first();
+  headerRow.find('th').each(function(index) {
+    var day = $(this).text();
+    day = day.replace(/ /g, ''); // remove that whitespace
+    day = day.replace(/\n/g, ' ');
+    day = day.trim();
+    days.push(day);
+  });
+  return days;
+}
 
 app.listen('8081')
 console.log('LSF Scrapping happens on port 8081');
