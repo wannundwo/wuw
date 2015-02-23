@@ -38,14 +38,16 @@ app.get('/scrape', function(req, res){
       // iterate over each row and each cell
       rows.each(function(i) {
         var cells = $(this).children('td:not(:first-child)');
+
+        // it seems like cheerio doesnt support collection.get(), so we just
+        // bottle that cheerio collection into a native array. 
         var cellsArray = [];
         cells.each(function(j) {
           cellsArray.push($(this));
         });
 
         for (var j = 0; j < days.length; j++) {
-          if (timeTableGrid[i][j] == ".") {
-            // here must be a td element
+          if (timeTableGrid[i][j] == ".") { // here must be a td-(lecture)-element
 
             var currCell = cellsArray[0];
             cellsArray.shift(); // removes the first element, its a pseudo queue
@@ -63,11 +65,7 @@ app.get('/scrape', function(req, res){
               var moreLectures = parseLecturesFromHtml(currCell, days, j);
               Array.prototype.push.apply(lectures, moreLectures); // join two arrays, the js way ¯\_(ツ)_/¯
             }
-
-          } else { // here is no td, because a lecture from above rowspans until here
-
           }
-
         }
         //outputAsTable(timeTableGrid, i); // we keep this comment as an debug toggle
       });
