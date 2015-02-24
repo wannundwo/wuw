@@ -28,8 +28,8 @@ app.use(bodyParser.json());
 mongoose.connect("mongodb://localhost:27017/wuw");
 
 // create models from our schemas
-var Lecture = require('./model_lecture');
-var Deadline = require('./model_deadline');
+var Lecture = require("./model_lecture");
+var Deadline = require("./model_deadline");
 
 
 // routes
