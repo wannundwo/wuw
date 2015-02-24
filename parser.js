@@ -87,9 +87,22 @@ var parseLecturesFromHtml = function(html, days, dayPos) {
     lecture.lsfTime = trimProperty($(this).find('td.notiz').first().text());
     lecture.lsfName = $(this).find('a').first().attr('title');
     lecture.lsfRoom = $(this).find('td.notiz a').first().text();
+    lecture.group = parseGroup(lecture.lsfName);
+    lecture.shortName = parseShortName(lecture.lsfName);
     lectures.push(lecture);
   });
   return lectures;
+}
+
+var parseGroup = function(s) {
+    return s.split(" ")[0];
+}
+
+var parseShortName = function(s) {
+    var parts = s.split(" ");
+    parts.shift();
+    var shortName = parts.join(" ");
+    return shortName;
 }
 
 var trimProperty = function(s) {
