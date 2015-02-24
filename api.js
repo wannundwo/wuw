@@ -24,12 +24,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 
-// load mongoCon module & connect to mongodb
-var mongoCon = require('./mongocon');
+// connect to mongodb
+mongoose.connect("mongodb://localhost:27017/wuw");
 
-// // create models which represent our database
-var Deadline = mongoCon.createDeadlineModel();
-var Lecture = mongoCon.createLectureModel();
+// create models from our schemas
+var Lecture = require('./model_lecture');
+var Deadline = require('./model_deadline');
 
 
 // routes
