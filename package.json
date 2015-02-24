@@ -5,6 +5,7 @@
   "main"         : "api.js",
   "author"       : "www.github.com/wannundwo",
   "dependencies" : {
+    "async"      : "latest",
     "express"    : "latest",
     "request"    : "latest",
     "cheerio"    : "latest",

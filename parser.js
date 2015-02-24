@@ -4,6 +4,7 @@ var request = require("request");
 var cheerio = require("cheerio");
 var moment  = require("moment");
 var mongoose = require("mongoose");
+var async = require("async");
 
 // just a static test url, later the client will send a week and a year
 var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=3_2015&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=";
@@ -74,25 +75,32 @@ request(url, function(error, response, html) {
     mongoose.connect("mongodb://localhost:27017/wuw");
 
     // create models from our schemas
-    var Lecture = require('./model_lecture');
-    var Deadline = require('./model_deadline');
+    var Lecture = require("./model_lecture");
+    var Deadline = require("./model_deadline");
 
-    lectures.forEach(function(lecture) {
-      // create Lecture from our Model
-      var Lec = new Lecture();
-      // set attributes
-      Lec.date = lecture.start;
-      Lec.fullLectureName = lecture.lsfName;
-      Lec.shortLectureName = lecture.shortName;
-      Lec.room = lecture.lsfRoom;
-      Lec.startTime = lecture.start;
-      Lec.endTime = lecture.end;
-      Lec.group = lecture.group;
-      // save lecture to db
-      Lec.save();
+    // drop current lecture collection to get a fresh result
+    mongoose.connection.collections["lectures"].drop(function(err) {
+      if(err) console.log(err);
+
+      // push every lecture to our db
+      async.each(lectures, function(lecture, cb) {
+        // create Lecture from our Model
+        var Lec = new Lecture();
+        // set attributes
+        Lec.date = lecture.start;
+        Lec.fullLectureName = lecture.lsfName;
+        Lec.shortLectureName = lecture.shortName;
+        Lec.room = lecture.lsfRoom;
+        Lec.startTime = lecture.start;
+        Lec.endTime = lecture.end;
+        Lec.group = lecture.group;
+        // save lecture to db
+        Lec.save(cb);
+      }, function(err) {
+        if (err) console.log(err);
+        mongoose.disconnect();
+      });
     });
-
-    mongoose.disconnect();
 
     // output lectures
     //console.log(JSON.stringify(lectures, null, 2));
@@ -122,7 +130,7 @@ var parseLecturesFromHtml = function(html, days, dayPos) {
     lectures.push(lecture);
   });
   return lectures;
-}
+};
 
 var parseGroup = function(s) {
     return s.split(" ")[0];
@@ -140,7 +148,7 @@ var parseStartEnd = function(date, time) {
     var end = null;
     var timeString = time.split(" ")[0];
     var starTimeString = timeString.split("-")[0];
-    var endTimeString = timeString.split("-")[1]
+    var endTimeString = timeString.split("-")[1];
 
     var dateString = date.split(" ")[1];
     var startString = dateString + " " + starTimeString;
