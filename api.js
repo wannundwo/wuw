@@ -25,8 +25,7 @@ app.use(bodyParser.json());
 
 
 // connect to mongodb
-var lectureCon = mongoose.createConnection("mongodb://localhost:27017/lectures");
-var deadlineCon = mongoose.createConnection("mongodb://localhost:27017/deadlines");
+mongoose.connect("mongodb://localhost:27017/wuw");
 
 // create mongodb schemas (database structure)
 var LectureSchema = new mongoose.Schema({
@@ -45,8 +44,8 @@ var DeadlineSchema = new mongoose.Schema({
 });
 
 // create models from our schemas
-var Lecture = lectureCon.model("Lecture", LectureSchema);
-var Deadline = deadlineCon.model("Deadline", DeadlineSchema);
+var Lecture = mongoose.model("Lecture", LectureSchema, "lectures");
+var Deadline = mongoose.model("Deadline", DeadlineSchema, "deadlines");
 
 
 // routes
@@ -81,7 +80,7 @@ router.route("/lectures/:lecture_id")
 
     // get lecture with that id (GET /$apiBaseUrl/lectures/:lecture_id)
     .get(function(req, res) {
-        Lecture.findById(req.params.bear_id, function(err, lecture) {
+        Lecture.findById(req.params.lecture_id, function(err, lecture) {
             if (err) { res.send(err); }
             res.json(lecture);
         });
