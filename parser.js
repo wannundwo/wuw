@@ -2,6 +2,7 @@
 
 var request = require('request');
 var cheerio = require('cheerio');
+var moment  = require('moment');
 
 // just a static test url, later the client will send a week and a year
 var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=3_2015&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=";
@@ -80,17 +81,23 @@ var parseLecturesFromHtml = function(html, days, dayPos) {
   // there could be more then one groups in this lecture,
   // we create a lecture for every group
   html.find('table').each(function(i) {
+    var time = trimProperty($(this).find('td.notiz').first().text());
+    var date = days[dayPos];
+
     var lecture = {};
-    lecture.lsfDate = days[dayPos];
-    lecture.lsfTime = trimProperty($(this).find('td.notiz').first().text());
     lecture.lsfName = $(this).find('a').first().attr('title');
+    lecture.start = parseStartEnd(date, time).start;
+    lecture.end = parseStartEnd(date, time).end;
+    lecture.lsfDate = date;
+    lecture.lsfTime = time;
     lecture.lsfRoom = $(this).find('td.notiz a').first().text();
     lecture.group = parseGroup(lecture.lsfName);
     lecture.shortName = parseShortName(lecture.lsfName);
+
     lectures.push(lecture);
   });
   return lectures;
-};
+}
 
 var parseGroup = function(s) {
     return s.split(" ")[0];
@@ -102,6 +109,23 @@ var parseShortName = function(s) {
     var shortName = parts.join(" ");
     return shortName;
 };
+
+var parseStartEnd = function(date, time) {
+    var start = null;
+    var end = null;
+    var timeString = time.split(" ")[0];
+    var starTimeString = timeString.split("-")[0];
+    var endTimeString = timeString.split("-")[1]
+
+    var dateString = date.split(" ")[1];
+    var startString = dateString + " " + starTimeString;
+    var endString  = dateString + " " + endTimeString;
+
+    start = moment(startString, "DD-MM-YYYY HH:mm");
+    end = moment(endString, "DD-MM-YYYY HH:mm");
+
+    return { start: start, end: end };
+}
 
 var trimProperty = function(s) {
   s = s.replace(/ /g, ''); // remove that whitespace
