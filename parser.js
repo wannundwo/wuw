@@ -3,6 +3,7 @@
 var request = require("request");
 var cheerio = require("cheerio");
 var moment  = require("moment");
+var mongoose = require("mongoose");
 
 // just a static test url, later the client will send a week and a year
 var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=3_2015&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=";
@@ -69,8 +70,32 @@ request(url, function(error, response, html) {
       //outputAsTable(timeTableGrid, i); // we keep this comment as an debug toggle
     });
 
+    // connect to mongodb
+    mongoose.connect("mongodb://localhost:27017/wuw");
+
+    // create models from our schemas
+    var Lecture = require('./model_lecture');
+    var Deadline = require('./model_deadline');
+
+    lectures.forEach(function(lecture) {
+      // create Lecture from our Model
+      var Lec = new Lecture();
+      // set attributes
+      Lec.date = lecture.start;
+      Lec.fullLectureName = lecture.lsfName;
+      Lec.shortLectureName = lecture.shortName;
+      Lec.room = lecture.lsfRoom;
+      Lec.startTime = lecture.start;
+      Lec.endTime = lecture.end;
+      Lec.group = lecture.group;
+      // save lecture to db
+      Lec.save();
+    });
+
+    mongoose.disconnect();
+
     // output lectures
-    console.log(JSON.stringify(lectures, null, 2));
+    //console.log(JSON.stringify(lectures, null, 2));
   }
 });
 
