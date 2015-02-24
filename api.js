@@ -24,28 +24,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 
-// connect to mongodb
-mongoose.connect("mongodb://localhost:27017/wuw");
+// load mongoCon module & connect to mongodb
+var mongoCon = require('./mongocon');
 
-// create mongodb schemas (database structure)
-var LectureSchema = new mongoose.Schema({
-    date: Date,
-    fullLectureName: String,
-    shortLectureName: String,
-    room: String,
-    startTime: Date,
-    endTime: Date,
-    group: String
-});
-var DeadlineSchema = new mongoose.Schema({
-    deadline: Date,
-    shortLectureName: String,
-    group: String
-});
-
-// create models from our schemas
-var Lecture = mongoose.model("Lecture", LectureSchema, "lectures");
-var Deadline = mongoose.model("Deadline", DeadlineSchema, "deadlines");
+// // create models which represent our database
+var Deadline = mongoCon.createDeadlineModel();
+var Lecture = mongoCon.createLectureModel();
 
 
 // routes
