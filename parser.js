@@ -1,8 +1,8 @@
 "use strict";
 
-var request = require('request');
-var cheerio = require('cheerio');
-var moment  = require('moment');
+var request = require("request");
+var cheerio = require("cheerio");
+var moment  = require("moment");
 
 // just a static test url, later the client will send a week and a year
 var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=3_2015&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=";
@@ -19,12 +19,12 @@ request(url, function(error, response, html) {
     days = getDaysInThisWeek($);
 
     // remove td.plan rahmen from the table, this removes a lot of trouble
-    table = $('th.plan_rahmen').closest('table');
-    table.find('.plan_rahmen').remove();
+    table = $("th.plan_rahmen").closest("table");
+    table.find(".plan_rahmen").remove();
 
     // lets parse
     // get all the rows of the timetable (except the header (days) row)
-    var rows = table.children('tr:not(:first-child)');
+    var rows = table.children("tr:not(:first-child)");
 
     // create and prefill the grid, which holds our whole timetable
     for (var i = 0; i < rows.length; i++) {     // rows
@@ -36,7 +36,7 @@ request(url, function(error, response, html) {
 
     // iterate over each row and each cell
     rows.each(function(i) {
-      var cells = $(this).children('td:not(:first-child)');
+      var cells = $(this).children("td:not(:first-child)");
 
       // it seems like cheerio doesnt support collection.get(), so we just
       // bottle that cheerio collection into a native array.
@@ -51,11 +51,11 @@ request(url, function(error, response, html) {
           var currCell = cellsArray[0];
           cellsArray.shift(); // removes the first element, its a pseudo queue
 
-          if (currCell.attr('class').indexOf('plan1') > -1) {
+          if (currCell.attr("class").indexOf("plan1") > -1) {
             // no lecture here
-          } else if (currCell.attr('class').indexOf('plan2') > -1) { // here we have a lecture
+          } else if (currCell.attr("class").indexOf("plan2") > -1) { // here we have a lecture
             // now mark the whole rowspan down as the same lecture
-            var rowspan = currCell.attr('rowspan');
+            var rowspan = currCell.attr("rowspan");
             for (var k = 0; k < rowspan; k++) {
               timeTableGrid[i+k][j] = j;
             }
@@ -80,17 +80,17 @@ var parseLecturesFromHtml = function(html, days, dayPos) {
 
   // there could be more then one groups in this lecture,
   // we create a lecture for every group
-  html.find('table').each(function(i) {
-    var time = trimProperty($(this).find('td.notiz').first().text());
+  html.find("table").each(function(i) {
+    var time = trimProperty($(this).find("td.notiz").first().text());
     var date = days[dayPos];
 
     var lecture = {};
-    lecture.lsfName = $(this).find('a').first().attr('title');
+    lecture.lsfName = $(this).find("a").first().attr("title");
     lecture.start = parseStartEnd(date, time).start;
     lecture.end = parseStartEnd(date, time).end;
     lecture.lsfDate = date;
     lecture.lsfTime = time;
-    lecture.lsfRoom = $(this).find('td.notiz a').first().text();
+    lecture.lsfRoom = $(this).find("td.notiz a").first().text();
     lecture.group = parseGroup(lecture.lsfName);
     lecture.shortName = parseShortName(lecture.lsfName);
 
@@ -128,8 +128,8 @@ var parseStartEnd = function(date, time) {
 }
 
 var trimProperty = function(s) {
-  s = s.replace(/ /g, ''); // remove that whitespace
-  s = s.replace(/\n/g, ' ');
+  s = s.replace(/ /g, ""); // remove that whitespace
+  s = s.replace(/\n/g, " ");
   s = s.trim();
   return s;
 };
@@ -149,11 +149,11 @@ var outputAsTable = function(timeTableGrid, iteration) {
 
 var getDaysInThisWeek = function($) {
   var days = [];
-  var headerRow = $('th.plan_rahmen').closest('table').children('tr').first();
-  headerRow.find('th').each(function(index) {
+  var headerRow = $("th.plan_rahmen").closest("table").children("tr").first();
+  headerRow.find("th").each(function(index) {
     var day = $(this).text();
-    day = day.replace(/ /g, '');
-    day = day.replace(/\n/g, ' ');
+    day = day.replace(/ /g, "");
+    day = day.replace(/\n/g, " ");
     day = day.trim();
     days.push(day);
   });
