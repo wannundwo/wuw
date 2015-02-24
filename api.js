@@ -55,7 +55,7 @@ router.route("/lectures")
     .get(function(req, res) {
         Lecture.find(function(err, lectures) {
             if (err) { res.send(err); }
-            res.json(lectures);
+            res.write(JSON.stringify(lectures, null, 2));
         });
     });
 
@@ -66,7 +66,7 @@ router.route("/lectures/:lecture_id")
     .get(function(req, res) {
         Lecture.findById(req.params.lecture_id, function(err, lecture) {
             if (err) { res.send(err); }
-            res.json(lecture);
+            res.write(JSON.stringify(lecture, null, 2));
         });
     });
 
@@ -78,7 +78,7 @@ router.route("/deadlines")
     .get(function(req, res) {
         Deadline.find(function(err, deadlines) {
             if (err) { res.send(err); }
-            res.json(deadlines);
+            res.write(JSON.stringify(deadlines, null, 2));
         });
     })
 
@@ -104,7 +104,7 @@ router.route("/deadlines/:deadline_id")
     .get(function(req, res) {
         Deadline.findById(req.params.deadline_id, function(err, deadline) {
             if (err) { res.send(err); }
-            res.json(deadline);
+            res.write(JSON.stringify(deadline, null, 2));
         });
     })
 
