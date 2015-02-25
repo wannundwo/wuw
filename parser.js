@@ -79,7 +79,7 @@ request(url, function(error, response, html) {
     var Deadline = require("./model_deadline");
 
     // drop current lecture collection to get a fresh result
-    mongoose.connection.collections["lectures"].drop(function(err) {
+    mongoose.connection.collections.lectures.drop(function(err) {
       if(err) console.log(err);
 
       // push every lecture to our db
