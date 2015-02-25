@@ -94,6 +94,7 @@ request(url, function(error, response, html) {
         Lec.startTime = lecture.start;
         Lec.endTime = lecture.end;
         Lec.group = lecture.group;
+        Lec.hashCode = lecture.hashCode;
         // save lecture to db
         Lec.save(cb);
       }, function(err) {
@@ -126,6 +127,7 @@ var parseLecturesFromHtml = function(html, days, dayPos) {
     lecture.lsfRoom = $(this).find("td.notiz a").first().text();
     lecture.group = parseGroup(lecture.lsfName);
     lecture.shortName = parseShortName(lecture.lsfName);
+    lecture.hashCode = hashCode(lecture.lsfName+lecture.lsfDate+lecture.lsfTime+lecture.lsfRoom);
 
     lectures.push(lecture);
   });
@@ -191,4 +193,15 @@ var getDaysInThisWeek = function($) {
     days.push(day);
   });
   return days;
+};
+
+var hashCode = function(s){
+	var hash = 0;
+	if (s.length === 0) return hash;
+	for (var i = 0; i < s.length; i++) {
+		var char = s.charCodeAt(i);
+		hash = ((hash<<5)-hash)+char;
+		hash = hash & hash; // Convert to 32bit integer
+	}
+	return hash;
 };

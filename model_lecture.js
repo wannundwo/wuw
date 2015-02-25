@@ -8,7 +8,8 @@ var LectureSchema = new mongoose.Schema({
     room: String,
     startTime: Date,
     endTime: Date,
-    group: String
+    group: String,
+    hashCode: String
 });
 
 // create model from our schema & export it
