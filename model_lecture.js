@@ -9,7 +9,7 @@ var LectureSchema = new mongoose.Schema({
     startTime: Date,
     endTime: Date,
     group: String,
-    hashCode: String
+    hashCode: { type: String, index: { unique: true }}
 });
 
 // create model from our schema & export it
