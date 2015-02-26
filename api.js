@@ -88,11 +88,12 @@ router.route("/deadlines")
     // create a deadline (POST /$apiBaseUrl/deadlines)
     .post(function(req, res) {
         if (err) { res.status(500).send(err); }
-        
+
         // create instance of Deadline model
         var deadline = new Deadline();
         // set attributes
         deadline.deadline = req.body.deadline;
+        deadline.info = req.body.info;
         deadline.shortLectureName = req.body.shortLectureName;
         deadline.group = req.body.group;
         // save deadline in mongodb

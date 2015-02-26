@@ -2,9 +2,8 @@ var mongoose = require("mongoose");
 
 // create mongodb schema for our deadlines
 var DeadlineSchema = new mongoose.Schema({
-    title: String,
     info: String,
-    deadline: Date, // this is the "Abgabetermin"
+    deadline: Date, // this is the "Abgabetermin" <- lol! :D
     shortLectureName: String,
     group: String
 });
