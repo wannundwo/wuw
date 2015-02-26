@@ -45,6 +45,7 @@ router.use(function(req, res, next) {
 // test route to make sure everything is working (GET /$apiBaseUrl)
 router.get("/", function(req, res) {
     res.status(200).json({ message: "welcome to the wuw api v" + apiVersion });
+    res.end();
 });
 
 
