@@ -55,7 +55,7 @@ router.route("/lectures")
     .get(function(req, res) {
         Lecture.find(function(err, lectures) {
             if (err) { res.status(500).send(err); }
-            res.status(200).write(JSON.stringify(lectures, null, 2));
+            res.status(200).json(lectures);
             res.end();
         });
     });
@@ -67,7 +67,7 @@ router.route("/lectures/:lecture_id")
     .get(function(req, res) {
         Lecture.findById(req.params.lecture_id, function(err, lecture) {
             if (err) { res.status(500).send(err); }
-            res.status(200).write(JSON.stringify(lecture, null, 2));
+            res.status(200).json(lecture);
             res.end();
         });
     });
@@ -80,7 +80,7 @@ router.route("/deadlines")
     .get(function(req, res) {
         Deadline.find(function(err, deadlines) {
             if (err) { res.status(500).send(err); }
-            res.status(200).write(JSON.stringify(deadlines, null, 2));
+            res.status(200).json(deadlines);
             res.end();
         });
     })
@@ -108,7 +108,7 @@ router.route("/deadlines/:deadline_id")
     .get(function(req, res) {
         Deadline.findById(req.params.deadline_id, function(err, deadline) {
             if (err) { res.status(500).send(err); }
-            res.status(200).write(JSON.stringify(deadline, null, 2));
+            res.status(200).json(deadline);
             res.end();
         });
     })
