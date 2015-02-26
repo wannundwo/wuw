@@ -54,8 +54,8 @@ router.route("/lectures")
     // get all lectures (GET /$apiBaseUrl/lectures)
     .get(function(req, res) {
         Lecture.find(function(err, lectures) {
-            if (err) { res.send(err); }
-            res.write(JSON.stringify(lectures, null, 2));
+            if (err) { res.status(500).send(err); }
+            res.status(200).write(JSON.stringify(lectures, null, 2));
             res.end();
         });
     });
@@ -66,8 +66,8 @@ router.route("/lectures/:lecture_id")
     // get lecture with that id (GET /$apiBaseUrl/lectures/:lecture_id)
     .get(function(req, res) {
         Lecture.findById(req.params.lecture_id, function(err, lecture) {
-            if (err) { res.send(err); }
-            res.write(JSON.stringify(lecture, null, 2));
+            if (err) { res.status(500).send(err); }
+            res.status(200).write(JSON.stringify(lecture, null, 2));
             res.end();
         });
     });
@@ -79,14 +79,16 @@ router.route("/deadlines")
     // get all deadlines (GET /$apiBaseUrl/deadlines)
     .get(function(req, res) {
         Deadline.find(function(err, deadlines) {
-            if (err) { res.send(err); }
-            res.write(JSON.stringify(deadlines, null, 2));
+            if (err) { res.status(500).send(err); }
+            res.status(200).write(JSON.stringify(deadlines, null, 2));
             res.end();
         });
     })
 
     // create a deadline (POST /$apiBaseUrl/deadlines)
     .post(function(req, res) {
+        if (err) { res.status(500).send(err); }
+        
         // create instance of Deadline model
         var deadline = new Deadline();
         // set attributes
@@ -96,7 +98,7 @@ router.route("/deadlines")
         // save deadline in mongodb
         deadline.save(function(err) {
             if (err) { res.send(err); }
-            res.json({ message: "Deadline created!" });
+            res.status(200).json({ message: "Deadline created!" });
         });
     });
 
@@ -106,8 +108,8 @@ router.route("/deadlines/:deadline_id")
     // get deadline with that id (GET /$apiBaseUrl/deadlines/:deadline_id)
     .get(function(req, res) {
         Deadline.findById(req.params.deadline_id, function(err, deadline) {
-            if (err) { res.send(err); }
-            res.write(JSON.stringify(deadline, null, 2));
+            if (err) { res.status(500).send(err); }
+            res.status(200).write(JSON.stringify(deadline, null, 2));
             res.end();
         });
     })
@@ -115,7 +117,7 @@ router.route("/deadlines/:deadline_id")
     // update deadline with this id
     .put(function(req, res) {
         Deadline.findById(req.params.deadline_id, function(err, deadline) {
-            if (err) { res.send(err); }
+            if (err) { res.status(500).send(err); }
 
             // set new attributes
             deadline.deadline = req.body.deadline;
@@ -124,7 +126,7 @@ router.route("/deadlines/:deadline_id")
 
             deadline.save(function(err) {
                 if (err) { res.send(err); }
-                res.json({ message: "Deadline updated!" });
+                res.status(200).json({ message: "Deadline updated!" });
             });
 
         });
@@ -135,8 +137,8 @@ router.route("/deadlines/:deadline_id")
         Deadline.remove({
             _id: req.params.deadline_id
         }, function(err) {
-            if (err) { res.send(err); }
-            res.json({ message: "Deadline successfully deleted" });
+            if (err) { res.status(500).send(err); }
+            res.status(200).json({ message: "Deadline successfully deleted" });
         });
     });
 
