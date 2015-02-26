@@ -87,8 +87,6 @@ router.route("/deadlines")
 
     // create a deadline (POST /$apiBaseUrl/deadlines)
     .post(function(req, res) {
-        if (err) { res.status(500).send(err); }
-
         // create instance of Deadline model
         var deadline = new Deadline();
         // set attributes
