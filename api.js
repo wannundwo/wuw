@@ -95,6 +95,7 @@ router.route("/deadlines")
     // create a deadline (POST /$apiBaseUrl/deadlines)
     .post(function(req, res) {
         // create instance of Deadline model
+        console.log(req.body);
         var deadline = new Deadline();
         // set attributes
         deadline.deadline = req.body.deadline;
@@ -102,9 +103,10 @@ router.route("/deadlines")
         deadline.shortLectureName = req.body.shortLectureName;
         deadline.group = req.body.group;
         // save deadline in mongodb
-        deadline.save(function(err) {
+        console.log(deadline);
+        deadline.save(function(err, deadline) {
             if (err) { res.send(err); }
-            res.status(200).json({ message: "Deadline created!" });
+            res.status(200).json({ message: "Deadline created!", id: deadline.id });
         });
     });
 
