@@ -105,6 +105,7 @@ request(url, function(error, response, html) {
 
     // output lectures
     //console.log(JSON.stringify(lectures, null, 2));
+    console.log("Success! The parser inserted " + lectures.length + " lectures in the database");
   }
 });
 
