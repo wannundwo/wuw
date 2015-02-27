@@ -60,7 +60,7 @@ router.route("/lectures")
 
     // get all lectures (GET /$apiBaseUrl/lectures)
     .get(function(req, res) {
-        Lecture.find(function(err, lectures) {
+        Lecture.find({}).sort({startTime: -1}).exec(function(err, lectures) {
             if (err) { res.status(500).send(err); }
             res.status(200).json(lectures);
             res.end();
