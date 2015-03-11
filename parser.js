@@ -7,7 +7,7 @@ var mongoose = require("mongoose");
 var async = require("async");
 
 // just a static test url, later the client will send a week and a year
-var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=3_2015&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=";
+var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=12_2015&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=";
 
 request(url, function(error, response, html) {
   if(!error) {
