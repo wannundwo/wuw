@@ -100,12 +100,12 @@ request(url, function(error, response, html) {
       }, function(err) {
         if (err) console.log(err);
         mongoose.disconnect();
+        
+        // output lectures
+        //console.log(JSON.stringify(lectures, null, 2));
+        console.log("Success! The parser inserted " + lectures.length + " lectures in the database");
       });
     });
-
-    // output lectures
-    //console.log(JSON.stringify(lectures, null, 2));
-    console.log("Success! The parser inserted " + lectures.length + " lectures in the database");
   }
 });
 
