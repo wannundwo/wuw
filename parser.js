@@ -209,3 +209,5 @@ var hashCode = function(s){
 	}
 	return hash;
 };
+
+module.exports = { parse: parse };
