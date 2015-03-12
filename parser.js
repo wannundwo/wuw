@@ -11,103 +11,106 @@ var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstg
 
 request(url, function(error, response, html) {
   if(!error) {
-    var table = null;
-    var days = [];
-    var timeTableGrid = [];
-    var lectures = [];
-    var $ = cheerio.load(html);
-
-    // load days before we cut of td.plan_rahmen stuff
-    days = getDaysInThisWeek($);
-
-    // remove td.plan rahmen from the table, this removes a lot of trouble
-    table = $("th.plan_rahmen").closest("table");
-    table.find(".plan_rahmen").remove();
-
-    // lets parse
-    // get all the rows of the timetable (except the header (days) row)
-    var rows = table.children("tr:not(:first-child)");
-
-    // create and prefill the grid, which holds our whole timetable
-    for (var i = 0; i < rows.length; i++) {     // rows
-      timeTableGrid[i] = new Array(days.length);
-      for (var j = 0; j < days.length; j++) {   // columns
-        timeTableGrid[i][j] = ".";
-      }
-    }
-
-    // iterate over each row and each cell
-    rows.each(function(i) {
-      var cells = $(this).children("td:not(:first-child)");
-
-      // it seems like cheerio doesnt support collection.get(), so we just
-      // bottle that cheerio collection into a native array.
-      var cellsArray = [];
-      cells.each(function(j) {
-        cellsArray.push($(this));
-      });
-
-      for (var j = 0; j < days.length; j++) {
-        if (timeTableGrid[i][j] === ".") { // here must be a td-(lecture)-element
-
-          var currCell = cellsArray[0];
-          cellsArray.shift(); // removes the first element, its a pseudo queue
-
-          if (currCell.attr("class").indexOf("plan1") > -1) {
-            // no lecture here
-          } else if (currCell.attr("class").indexOf("plan2") > -1) { // here we have a lecture
-            // now mark the whole rowspan down as the same lecture
-            var rowspan = currCell.attr("rowspan");
-            for (var k = 0; k < rowspan; k++) {
-              timeTableGrid[i+k][j] = j;
-            }
-
-            /******** PARSE THE LECURE TD *********/
-            var moreLectures = parseLecturesFromHtml(currCell, days, j);
-            Array.prototype.push.apply(lectures, moreLectures); // join two arrays, the js way ¯\_(ツ)_/¯
-          }
-        }
-      }
-      //outputAsTable(timeTableGrid, i); // we keep this comment as an debug toggle
-    });
-
-    // connect to mongodb
-    mongoose.connect("mongodb://localhost:27017/wuw");
-
-    // create models from our schemas
-    var Lecture = require("./model_lecture");
-    var Deadline = require("./model_deadline");
-
-    // drop current lecture collection to get a fresh result
-    mongoose.connection.collections.lectures.drop(function(err) {
-      if(err) console.log(err);
-
-      // push every lecture to our db
-      async.each(lectures, function(lecture, cb) {
-        // create Lecture from our Model
-        var Lec = new Lecture();
-        // set attributes
-        Lec.date = lecture.start;
-        Lec.fullLectureName = lecture.lsfName;
-        Lec.shortLectureName = lecture.shortName;
-        Lec.room = lecture.lsfRoom;
-        Lec.startTime = lecture.start;
-        Lec.endTime = lecture.end;
-        Lec.group = lecture.group;
-        Lec.hashCode = lecture.hashCode;
-        // save lecture to db
-        Lec.save(cb);
-      }, function(err) {
-        if (err) console.log(err);
-        mongoose.disconnect();
-        
-        // output lectures
-        //console.log(JSON.stringify(lectures, null, 2));
-        console.log("Success! The parser inserted " + lectures.length + " lectures in the database");
-      });
-    });
+    parse(html);
   }
 });
+
+var parse = function(html) {
+  var table = null;
+  var days = [];
+  var timeTableGrid = [];
+  var lectures = [];
+  var $ = cheerio.load(html);
+
+  // load days before we cut of td.plan_rahmen stuff
+  days = getDaysInThisWeek($);
+
+  // remove td.plan rahmen from the table, this removes a lot of trouble
+  table = $("th.plan_rahmen").closest("table");
+  table.find(".plan_rahmen").remove();
+
+  // lets parse
+  // get all the rows of the timetable (except the header (days) row)
+  var rows = table.children("tr:not(:first-child)");
+
+  // create and prefill the grid, which holds our whole timetable
+  for (var i = 0; i < rows.length; i++) {     // rows
+    timeTableGrid[i] = new Array(days.length);
+    for (var j = 0; j < days.length; j++) {   // columns
+      timeTableGrid[i][j] = ".";
+    }
+  }
+
+  // iterate over each row and each cell
+  rows.each(function(i) {
+    var cells = $(this).children("td:not(:first-child)");
+
+    // it seems like cheerio doesnt support collection.get(), so we just
+    // bottle that cheerio collection into a native array.
+    var cellsArray = [];
+    cells.each(function(j) {
+      cellsArray.push($(this));
+    });
+
+    for (var j = 0; j < days.length; j++) {
+      if (timeTableGrid[i][j] === ".") { // here must be a td-(lecture)-element
+
+        var currCell = cellsArray[0];
+        cellsArray.shift(); // removes the first element, its a pseudo queue
+
+        if (currCell.attr("class").indexOf("plan1") > -1) {
+          // no lecture here
+        } else if (currCell.attr("class").indexOf("plan2") > -1) { // here we have a lecture
+          // now mark the whole rowspan down as the same lecture
+          var rowspan = currCell.attr("rowspan");
+          for (var k = 0; k < rowspan; k++) {
+            timeTableGrid[i+k][j] = j;
+          }
+
+          /******** PARSE THE LECURE TD *********/
+          var moreLectures = parseLecturesFromHtml(currCell, days, j);
+          Array.prototype.push.apply(lectures, moreLectures); // join two arrays, the js way ¯\_(ツ)_/¯
+        }
+      }
+    }
+  });
+
+  // connect to mongodb
+  mongoose.connect("mongodb://localhost:27017/wuw");
+
+  // create models from our schemas
+  var Lecture = require("./model_lecture");
+  var Deadline = require("./model_deadline");
+
+  // drop current lecture collection to get a fresh result
+  mongoose.connection.collections.lectures.drop(function(err) {
+    if(err) console.log(err);
+
+    // push every lecture to our db
+    async.each(lectures, function(lecture, cb) {
+      // create Lecture from our Model
+      var Lec = new Lecture();
+      // set attributes
+      Lec.date = lecture.start;
+      Lec.fullLectureName = lecture.lsfName;
+      Lec.shortLectureName = lecture.shortName;
+      Lec.room = lecture.lsfRoom;
+      Lec.startTime = lecture.start;
+      Lec.endTime = lecture.end;
+      Lec.group = lecture.group;
+      Lec.hashCode = lecture.hashCode;
+      // save lecture to db
+      Lec.save(cb);
+    }, function(err) {
+      if (err) console.log(err);
+      mongoose.disconnect();
+
+      // output lectures
+      console.log(JSON.stringify(lectures, null, 2));
+      console.log("Success! The parser inserted " + lectures.length + " lectures in the database");
+    });
+  });
+};
 
 var parseLecturesFromHtml = function(html, days, dayPos) {
   var lectures = [];
