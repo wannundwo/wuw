@@ -31,5 +31,24 @@ describe('Parser', function(){
       });
     })
     
+    it('should be 12 lectures in SS15 IF2', function(done) {
+      fs.readFile('./test/data/ss15_if2.html', 'utf8', function (err, html) {
+        if (err) return console.log(err);
+        var lectures = parser.parse(html);
+        assert.equal(12, lectures.length);
+        done();
+      });
+    })
+    
+    it('GdI should have hash 1561404269', function(done) {
+      fs.readFile('./test/data/ss15_if2.html', 'utf8', function (err, html) {
+        if (err) return console.log(err);
+        var lectures = parser.parse(html);
+        var gdi = lectures[11];
+        assert.equal("1561404269", gdi.hashCode);
+        done();
+      });
+    })
+    
   })
 })
