@@ -68,8 +68,8 @@ var parse = function(html) {
             timeTableGrid[i+k][j] = j;
           }
 
-          /******** PARSE THE LECURE TD *********/
-          var moreLectures = parseLecturesFromHtml(currCell, days, j);
+          /******** PARSE THE LECTURE TD *********/
+          var moreLectures = parseGroupsInLecture(currCell, days, j);
           Array.prototype.push.apply(lectures, moreLectures); // join two arrays, the js way ¯\_(ツ)_/¯
         }
       }
@@ -116,7 +116,7 @@ var insertInDatabase = function(lectures) {
   });
 };
 
-var parseLecturesFromHtml = function(html, days, dayPos) {
+var parseGroupsInLecture = function(html, days, dayPos) {
   var lectures = [];
   var $ = cheerio.load(html);
 
