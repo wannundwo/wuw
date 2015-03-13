@@ -1,10 +1,10 @@
 "use strict";
 
-var request = require("request");
-var cheerio = require("cheerio");
-var moment  = require("moment");
+var request  = require("request");
+var cheerio  = require("cheerio");
+var moment   = require("moment");
 var mongoose = require("mongoose");
-var async = require("async");
+var async    = require("async");
 
 // just a static test url, later the client will send a week and a year
 var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=12_2015&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=";
@@ -70,7 +70,7 @@ var parse = function(html) {
 
           // parse the lectures td element
           var moreLectures = parseGroupsInLecture(currCell, days, j);
-          Array.prototype.push.apply(lectures, moreLectures); // join two arrays, the js way ¯\_(ツ)_/¯
+          lectures = lectures.concat(moreLectures);          
         }
       }
     }
