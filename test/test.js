@@ -40,12 +40,12 @@ describe('Parser', function(){
       });
     })
     
-    it('GdI should have hash d6260ad85c35994cc99ef4d1da14189f', function(done) {
+    it('GdI should have time', function(done) {
       fs.readFile('./test/data/ss15_if2.html', 'utf8', function (err, html) {
         if (err) return console.log(err);
         var lectures = parser.parse(html);
         var gdi = lectures[11];
-        assert.equal("d6260ad85c35994cc99ef4d1da14189f", gdi.hashCode);
+        assert.equal("15:45-17:15\r (1)", gdi.lsfTime);
         done();
       });
     })
