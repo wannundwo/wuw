@@ -1,4 +1,5 @@
 #This is the wuw server.
+[![Build Status](https://travis-ci.org/wannundwo/wuw_server.svg?branch=master)](https://travis-ci.org/wannundwo/wuw_server)
 
 ## Start the wuw-api like this:  
 1. install & start a local mongodb instance (http://docs.mongodb.org/manual/installation/)  
@@ -12,3 +13,7 @@ Use something like Postman (http://www.getpostman.com/) to test it
 1. npm install  
 2. node parser.js  
 3. open `http://localhost:8081/scrape` in your browser  
+
+## Unit Tests
+1. `npm install -g mocha`
+2. `mocha` or `npm test`
