@@ -74,8 +74,11 @@ var parse = function(html) {
       }
     }
   });
+  insertInDatabase(lectures);
+};
 
-  // connect to mongodb
+var insertInDatabase = function(lectures) {
+    // connect to mongodb
   mongoose.connect("mongodb://localhost:27017/wuw");
 
   // create models from our schemas
