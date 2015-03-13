@@ -11,7 +11,8 @@ var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstg
 
 request(url, function(error, response, html) {
   if(!error) {
-    parse(html);
+    var lectures = parse(html);
+    insertInDatabase(lectures);
   }
 });
 
@@ -74,11 +75,11 @@ var parse = function(html) {
       }
     }
   });
-  insertInDatabase(lectures);
+  return lectures;
 };
 
 var insertInDatabase = function(lectures) {
-    // connect to mongodb
+   // connect to mongodb
   mongoose.connect("mongodb://localhost:27017/wuw");
 
   // create models from our schemas
