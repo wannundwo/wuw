@@ -11,12 +11,12 @@ var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstg
 
 request(url, function(error, response, html) {
   if(!error) {
-    var lectures = parse(html);
+    var lectures = parse(html);    
     insertInDatabase(lectures);
   }
 });
 
-var parse = function(html) {
+var parse = function(html) {  
   var table = null;
   var days = [];
   var timeTableGrid = [];
@@ -42,7 +42,7 @@ var parse = function(html) {
     }
   }
 
-  // iterate over each row and each cell
+  // iterate over each row and each cell  
   rows.each(function(i) {
     var cells = $(this).children("td:not(:first-child)");
 
@@ -68,7 +68,7 @@ var parse = function(html) {
             timeTableGrid[i+k][j] = j;
           }
 
-          /******** PARSE THE LECTURE TD *********/
+          // parse the lectures td element
           var moreLectures = parseGroupsInLecture(currCell, days, j);
           Array.prototype.push.apply(lectures, moreLectures); // join two arrays, the js way ¯\_(ツ)_/¯
         }
@@ -107,10 +107,7 @@ var insertInDatabase = function(lectures) {
       Lec.save(cb);
     }, function(err) {
       if (err) console.log(err);
-      mongoose.disconnect();
-
-      // output lectures
-      console.log(JSON.stringify(lectures, null, 2));
+      mongoose.disconnect();      
       console.log("Success! The parser inserted " + lectures.length + " lectures in the database");
     });
   });
