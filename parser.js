@@ -5,6 +5,7 @@ var cheerio  = require("cheerio");
 var moment   = require("moment");
 var mongoose = require("mongoose");
 var async    = require("async");
+var crypto   = require('crypto');
 
 // just a static test url, later the client will send a week and a year
 var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=12_2015&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=";
@@ -201,14 +202,8 @@ var getDaysInThisWeek = function($) {
 };
 
 var hashCode = function(s){
-	var hash = 0;
-	if (s.length === 0) return hash;
-	for (var i = 0; i < s.length; i++) {
-		var char = s.charCodeAt(i);
-		hash = ((hash<<5)-hash)+char;
-		hash = hash & hash; // Convert to 32bit integer
-	}
-	return hash;
+	var hash = crypto.createHash('md5').update(s).digest('hex');
+    return hash;
 };
 
 module.exports = { parse: parse };

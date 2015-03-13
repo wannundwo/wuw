@@ -40,12 +40,12 @@ describe('Parser', function(){
       });
     })
     
-    it('GdI should have hash 1561404269', function(done) {
+    it('GdI should have hash d6260ad85c35994cc99ef4d1da14189f', function(done) {
       fs.readFile('./test/data/ss15_if2.html', 'utf8', function (err, html) {
         if (err) return console.log(err);
         var lectures = parser.parse(html);
         var gdi = lectures[11];
-        assert.equal("1561404269", gdi.hashCode);
+        assert.equal("d6260ad85c35994cc99ef4d1da14189f", gdi.hashCode);
         done();
       });
     })
