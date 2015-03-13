@@ -45,7 +45,7 @@ describe('Parser', function(){
         if (err) return console.log(err);
         var lectures = parser.parse(html);
         var gdi = lectures[11];
-        assert.equal("15:45-17:15\r (1)", gdi.lsfTime);
+        assert.equal("15:45-17:15(1)", gdi.lsfTime);
         done();
       });
     })

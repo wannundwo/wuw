@@ -170,7 +170,8 @@ var parseStartEnd = function(date, time) {
 
 var trimProperty = function(s) {
   s = s.replace(/ /g, ""); // remove that whitespace
-  s = s.replace(/\n/g, " ");
+  s = s.replace(/\n/g, "");
+  s = s.replace(/\r/g, "");
   s = s.trim();
   return s;
 };
