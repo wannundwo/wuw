@@ -4,6 +4,9 @@
   "description"  : "scrape the lsf to collect curses with room and time.",
   "main"         : "api.js",
   "author"       : "www.github.com/wannundwo",
+  "devDependencies": {
+    "mocha": "latest"
+  },
   "dependencies" : {
     "async"      : "latest",
     "express"    : "latest",
@@ -13,5 +16,8 @@
     "mongoose"   : "latest",
     "morgan"     : "latest",
     "moment"     : "latest"
+  },
+  "scripts": {
+    "test": "mocha"
   }
 }

@@ -11,11 +11,12 @@ var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstg
 
 request(url, function(error, response, html) {
   if(!error) {
-    parse(html);
+    var lectures = parse(html);    
+    insertInDatabase(lectures);
   }
 });
 
-var parse = function(html) {
+var parse = function(html) {  
   var table = null;
   var days = [];
   var timeTableGrid = [];
@@ -41,7 +42,7 @@ var parse = function(html) {
     }
   }
 
-  // iterate over each row and each cell
+  // iterate over each row and each cell  
   rows.each(function(i) {
     var cells = $(this).children("td:not(:first-child)");
 
@@ -67,15 +68,18 @@ var parse = function(html) {
             timeTableGrid[i+k][j] = j;
           }
 
-          /******** PARSE THE LECURE TD *********/
-          var moreLectures = parseLecturesFromHtml(currCell, days, j);
+          // parse the lectures td element
+          var moreLectures = parseGroupsInLecture(currCell, days, j);
           Array.prototype.push.apply(lectures, moreLectures); // join two arrays, the js way ¯\_(ツ)_/¯
         }
       }
     }
   });
+  return lectures;
+};
 
-  // connect to mongodb
+var insertInDatabase = function(lectures) {
+   // connect to mongodb
   mongoose.connect("mongodb://localhost:27017/wuw");
 
   // create models from our schemas
@@ -103,16 +107,13 @@ var parse = function(html) {
       Lec.save(cb);
     }, function(err) {
       if (err) console.log(err);
-      mongoose.disconnect();
-
-      // output lectures
-      console.log(JSON.stringify(lectures, null, 2));
+      mongoose.disconnect();      
       console.log("Success! The parser inserted " + lectures.length + " lectures in the database");
     });
   });
 };
 
-var parseLecturesFromHtml = function(html, days, dayPos) {
+var parseGroupsInLecture = function(html, days, dayPos) {
   var lectures = [];
   var $ = cheerio.load(html);
 
@@ -209,3 +210,5 @@ var hashCode = function(s){
 	}
 	return hash;
 };
+
+module.exports = { parse: parse };
