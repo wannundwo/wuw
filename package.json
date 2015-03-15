@@ -1,21 +1,22 @@
 {
-  "name"         : "lsf-scraper",
-  "version"      : "0.0.1",
-  "description"  : "scrape the lsf to collect curses with room and time.",
-  "main"         : "api.js",
-  "author"       : "www.github.com/wannundwo",
+  "name": "lsf-scraper",
+  "version": "0.0.1",
+  "description": "scrape the lsf to collect curses with room and time.",
+  "main": "api.js",
+  "author": "www.github.com/wannundwo",
   "devDependencies": {
     "mocha": "latest"
   },
-  "dependencies" : {
-    "async"      : "latest",
-    "express"    : "latest",
-    "request"    : "latest",
-    "cheerio"    : "latest",
+  "dependencies": {
+    "async": "latest",
     "body-parser": "latest",
-    "mongoose"   : "latest",
-    "morgan"     : "latest",
-    "moment"     : "latest"
+    "cheerio": "latest",
+    "cron": "^1.0.9",
+    "express": "latest",
+    "moment": "latest",
+    "mongoose": "latest",
+    "morgan": "latest",
+    "request": "latest"
   },
   "scripts": {
     "test": "mocha"

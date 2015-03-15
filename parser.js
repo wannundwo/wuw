@@ -5,17 +5,19 @@ var cheerio  = require("cheerio");
 var moment   = require("moment");
 var mongoose = require("mongoose");
 var async    = require("async");
-var crypto   = require('crypto');
+var crypto   = require("crypto");
 
 // just a static test url, later the client will send a week and a year
 var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=12_2015&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=";
 
-request(url, function(error, response, html) {
-  if(!error) {
-    var lectures = parse(html);    
-    insertInDatabase(lectures);
-  }
-});
+var startParser = function() {
+  request(url, function(error, response, html) {
+    if(!error) {
+      var lectures = parse(html);    
+      insertInDatabase(lectures);
+    }
+  });
+};
 
 var parse = function(html) {  
   var table = null;
@@ -80,8 +82,8 @@ var parse = function(html) {
 };
 
 var insertInDatabase = function(lectures) {
-   // connect to mongodb
-  mongoose.connect("mongodb://localhost:27017/wuw");
+  // connect to mongodb
+  //mongoose.connect("mongodb://localhost:27017/wuw");
 
   // create models from our schemas
   var Lecture = require("./model_lecture");
@@ -207,4 +209,4 @@ var hashCode = function(s){
     return hash;
 };
 
-module.exports = { parse: parse };
+module.exports = { startParser: startParser };

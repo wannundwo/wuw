@@ -1,11 +1,23 @@
 // wuw server
 "use strict";
 
-// import packages
+// import packages (api)
 var express = require("express");
 var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
 var morgan = require("morgan");
+
+// import packages (parser)
+var cronjob = require('cron').CronJob;
+var parser = require("./parser");
+
+
+// create cronjob for parser
+new cronjob("0 */15 * * * *", function(){
+    //console.log(Date.now());
+    parser.startParser();
+}, null, true, "Europe/Berlin");
+
 
 // create the express app & configure port
 var app = express();
@@ -25,9 +37,9 @@ app.use(bodyParser.json());
 
 // allow cross origin resource sharing
 app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
 });
 
 // connect to mongodb
