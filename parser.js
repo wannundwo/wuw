@@ -53,9 +53,7 @@ var parse = function(html) {
         var currCell = cellsArray[0];
         cellsArray.shift(); // removes the first element, its a pseudo queue
 
-        if (currCell.attr("class").indexOf("plan1") > -1) {
-          // no lecture here
-        } else if (currCell.attr("class").indexOf("plan2") > -1) { // here we have a lecture
+        if (currCell.attr("class").indexOf("plan2") > -1) { // here we have a lecture
           // now mark the whole rowspan down as the same lecture
           var rowspan = currCell.attr("rowspan");
           for (var k = 0; k < rowspan; k++) {
