@@ -11,7 +11,7 @@
     "async": "latest",
     "body-parser": "latest",
     "cheerio": "latest",
-    "cron": "^1.0.9",
+    "cron": "latest",
     "express": "latest",
     "moment": "latest",
     "mongoose": "latest",
