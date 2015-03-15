@@ -213,4 +213,4 @@ var hashCode = function(s){
 
 startParser();
 
-module.exports = { startParser: startParser };
+module.exports = { parse: parse, startParser: startParser };
