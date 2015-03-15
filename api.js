@@ -14,7 +14,7 @@ var parser = require("./parser");
 
 // create cronjob for parser
 new cronjob("0 */15 * * * *", function(){
-    //console.log(Date.now());
+    console.log(new Date() + ": starting parser...");
     parser.startParser();
 }, null, true, "Europe/Berlin");
 
