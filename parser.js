@@ -19,7 +19,7 @@ var startParser = function() {
   });
 };
 
-var parse = function(html) {  
+var parse = function(html) { 
   var table = null;
   var days = [];
   var timeTableGrid = [];
@@ -82,8 +82,10 @@ var parse = function(html) {
 };
 
 var insertInDatabase = function(lectures) {
-  // connect to mongodb
-  //mongoose.connect("mongodb://localhost:27017/wuw");
+  // connect to mongodb if not already
+  if(mongoose.connection.readyState === 0) {
+    mongoose.connect("mongodb://localhost:27017/wuw");
+  }
 
   // create models from our schemas
   var Lecture = require("./model_lecture");
@@ -208,5 +210,7 @@ var hashCode = function(s){
 	var hash = crypto.createHash('md5').update(s).digest('hex');
     return hash;
 };
+
+startParser();
 
 module.exports = { startParser: startParser };
