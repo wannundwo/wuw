@@ -10,15 +10,6 @@ var crypto   = require("crypto");
 // just a static test url, later the client will send a week and a year
 var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=12_2015&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=";
 
-var startParser = function() {
-  request(url, function(error, response, html) {
-    if(!error) {
-      var lectures = parse(html);    
-      insertInDatabase(lectures);
-    }
-  });
-};
-
 var parse = function(html) { 
   var table = null;
   var days = [];
@@ -89,11 +80,11 @@ var insertInDatabase = function(lectures) {
 
   // create models from our schemas
   var Lecture = require("./model_lecture");
-  var Deadline = require("./model_deadline");
+  //var Deadline = require("./model_deadline");
 
   // drop current lecture collection to get a fresh result
   mongoose.connection.collections.lectures.drop(function(err) {
-    if(err) console.log(err);
+    if(err) { console.log(err); }
 
     // push every lecture to our db
     async.each(lectures, function(lecture, cb) {
@@ -111,7 +102,7 @@ var insertInDatabase = function(lectures) {
       // save lecture to db
       Lec.save(cb);
     }, function(err) {
-      if (err) console.log(err);
+      if (err) { console.log(err); }
       mongoose.disconnect();      
       console.log("Success! The parser inserted " + lectures.length + " lectures in the database");
     });
@@ -170,7 +161,7 @@ var parseStartEnd = function(date, time) {
     end = moment(endString, "DD-MM-YYYY HH:mm");
 
     return { start: start, end: end };
-}
+};
 
 var trimProperty = function(s) {
   s = s.replace(/ /g, ""); // remove that whitespace
@@ -209,6 +200,15 @@ var getDaysInThisWeek = function($) {
 var hashCode = function(s){
 	var hash = crypto.createHash('md5').update(s).digest('hex');
     return hash;
+};
+
+var startParser = function() {
+  request(url, function(error, response, html) {
+    if(!error) {
+      var lectures = parse(html);    
+      insertInDatabase(lectures);
+    }
+  });
 };
 
 startParser();
