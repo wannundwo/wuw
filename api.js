@@ -8,15 +8,15 @@ var mongoose = require("mongoose");
 var morgan = require("morgan");
 
 // import packages (parser)
-var cronjob = require('cron').CronJob;
-var parser = require("./parser");
+// var cronjob = require('cron').CronJob;
+// var parser = require("./parser");
 
 
 // create cronjob for parser
-new cronjob("0 */15 * * * *", function(){
-    console.log(new Date() + ": starting parser...");
-    parser.startParser();
-}, null, true, "Europe/Berlin");
+// new cronjob("0 */15 * * * *", function(){
+//     console.log(new Date() + ": starting parser...");
+//     parser.startParser();
+// }, null, true, "Europe/Berlin");
 
 
 // create the express app & configure port
