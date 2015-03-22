@@ -210,7 +210,7 @@ var createUrls = function() {
   var urls = [];
   for(var i = 0; i < weeksToParse; i++) {
     var today = new Date();
-    var currentWeek = (today.getWeek() + i) % 52;
+    var currentWeek = (today.getWeek() + i) % 53;
     var currentYear = today.getFullYear();
     var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=" + currentWeek + "_" + currentYear + "&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=";
     urls.push(url);
