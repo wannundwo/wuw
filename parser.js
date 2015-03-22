@@ -7,9 +7,6 @@ var mongoose = require("mongoose");
 var async    = require("async");
 var crypto   = require("crypto");
 
-// just a static test url, later the client will send a week and a year
-var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=12_2015&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=";
-
 var parse = function(html) { 
   var table = null;
   var days = [];
@@ -101,7 +98,7 @@ var insertInDatabase = function(lectures) {
       Lec.save(cb);
     }, function(err) {
       if (err) { console.log(err); }
-      mongoose.disconnect();      
+      //mongoose.disconnect();
       console.log("Success! The parser inserted " + lectures.length + " lectures in the database");
     });
   });
@@ -200,15 +197,40 @@ var hashCode = function(s){
     return hash;
 };
 
+Date.prototype.getWeek = function() { 
+    var determinedate = new Date(); 
+    determinedate.setFullYear(this.getFullYear(), this.getMonth(), this.getDate()); 
+    var D = determinedate.getDay(); 
+    if(D == 0) D = 7; 
+    determinedate.setDate(determinedate.getDate() + (4 - D)); 
+    var YN = determinedate.getFullYear(); 
+    var ZBDoCY = Math.floor((determinedate.getTime() - new Date(YN, 0, 1, -6)) / 86400000); 
+    var WN = 1 + Math.floor(ZBDoCY / 7); 
+    return WN; 
+};
+
 var startParser = function() {
-  request(url, function(error, response, html) {
-    if(!error) {
-      var lectures = parse(html);    
-      insertInDatabase(lectures);
-    }
+  async.each(urls, function(url, cb) {
+    request(url, function(error, response, html) {
+      if(!error) {
+        var lectures = parse(html); 
+        insertInDatabase(lectures);
+      }
+    });
+  }, function(err) {
+    if (err) { console.log(err); }
+    mongoose.disconnect();
+    console.log("Successfully parsed all URLs");
   });
 };
 
+var today = new Date();
+var urls = [
+  "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=" + today.getWeek() + "_" + today.getFullYear() + "&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=",
+  "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=" + (today.getWeek()+1) + "_" + today.getFullYear() + "&act=stg&pool=stg&show=plan&P.vx=lang&P.Print="
+];
+
+// start the magic
 startParser();
 
 module.exports = { parse: parse, startParser: startParser };
