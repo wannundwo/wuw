@@ -7,6 +7,11 @@ var mongoose = require("mongoose");
 var async    = require("async");
 var crypto   = require("crypto");
 
+
+// how many weeks should we parse?
+var weeksToParse = 2;
+
+
 var parse = function(html) { 
   var table = null;
   var days = [];
@@ -67,40 +72,29 @@ var parse = function(html) {
   return lectures;
 };
 
-var insertInDatabase = function(lectures) {
-  // connect to mongodb if not already
-  if(mongoose.connection.readyState === 0) {
-    mongoose.connect("mongodb://localhost:27017/wuw");
-  }
-
+var insertInDatabase = function(lectures, cb) {
   // create models from our schemas
   var Lecture = require("./model_lecture");
-  //var Deadline = require("./model_deadline");
 
-  // drop current lecture collection to get a fresh result
-  mongoose.connection.collections.lectures.drop(function(err) {
-    if(err) { console.log(err); }
-
-    // push every lecture to our db
-    async.each(lectures, function(lecture, cb) {
-      // create Lecture from our Model
-      var Lec = new Lecture();
-      // set attributes
-      Lec.date = lecture.start;
-      Lec.fullLectureName = lecture.lsfName;
-      Lec.shortLectureName = lecture.shortName;
-      Lec.room = lecture.lsfRoom;
-      Lec.startTime = lecture.start;
-      Lec.endTime = lecture.end;
-      Lec.group = lecture.group;
-      Lec.hashCode = lecture.hashCode;
-      // save lecture to db
-      Lec.save(cb);
-    }, function(err) {
-      if (err) { console.log(err); }
-      //mongoose.disconnect();
-      console.log("Success! The parser inserted " + lectures.length + " lectures in the database");
-    });
+  // push every lecture to our db
+  async.each(lectures, function(lecture, cb) {
+    // create Lecture from our Model
+    var Lec = new Lecture();
+    // set attributes
+    Lec.date = lecture.start;
+    Lec.fullLectureName = lecture.lsfName;
+    Lec.shortLectureName = lecture.shortName;
+    Lec.room = lecture.lsfRoom;
+    Lec.startTime = lecture.start;
+    Lec.endTime = lecture.end;
+    Lec.group = lecture.group;
+    Lec.hashCode = lecture.hashCode;
+    // save lecture to db
+    Lec.save(cb);
+  }, function(err) {
+    if (err) { console.log(err); }
+    console.log("Added " + lectures.length + " lectures in the database...");
+    cb();
   });
 };
 
@@ -197,38 +191,68 @@ var hashCode = function(s){
     return hash;
 };
 
-Date.prototype.getWeek = function() { 
+Object.defineProperty(Date.prototype, "getWeek", {
+  value: function() {
     var determinedate = new Date(); 
     determinedate.setFullYear(this.getFullYear(), this.getMonth(), this.getDate()); 
     var D = determinedate.getDay(); 
-    if(D == 0) D = 7; 
+    if(D === 0) { D = 7; } 
     determinedate.setDate(determinedate.getDate() + (4 - D)); 
     var YN = determinedate.getFullYear(); 
     var ZBDoCY = Math.floor((determinedate.getTime() - new Date(YN, 0, 1, -6)) / 86400000); 
     var WN = 1 + Math.floor(ZBDoCY / 7); 
     return WN; 
+  }
+});
+
+// create urls including the week & year which we want to parse
+var createUrls = function() {
+  var urls = [];
+  for(var i = 0; i < weeksToParse; i++) {
+    var today = new Date();
+    var currentWeek = today.getWeek() + i;
+    var currentYear = today.getFullYear();
+    var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=" + currentWeek + "_" + currentYear + "&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=";
+    urls.push(url);
+  }
+  return urls;
 };
 
 var startParser = function() {
-  async.each(urls, function(url, cb) {
-    request(url, function(error, response, html) {
-      if(!error) {
-        var lectures = parse(html); 
-        insertInDatabase(lectures);
-      }
+  // connect to mongodb (if not already)
+  if(mongoose.connection.readyState === 0) {
+    mongoose.connect("mongodb://localhost:27017/wuw");
+  }
+
+  // create model from our schema (needed for drop)
+  var Lecture = require("./model_lecture");
+
+  // create the urls to parse
+  var urls = createUrls();
+
+  console.log("Started parsing of " + weeksToParse + " weeks (this inlcuded)...");
+
+  // drop current lecture collection to get a fresh result
+  mongoose.connection.collections.lectures.drop(function(err) {
+    if(err) { console.log(err); }
+
+    console.log("Dropped old \""+ Lecture.collection.name + "\" Collection, lets start clean...");
+
+    // parse every url
+    async.each(urls, function(url, cb) {
+      request(url, function(error, response, html) {
+        if(!error) {
+          var lectures = parse(html); 
+          insertInDatabase(lectures, cb);
+        }
+      });
+    }, function() {
+      // everything done
+      mongoose.disconnect();
+      console.log("...done!");
     });
-  }, function(err) {
-    if (err) { console.log(err); }
-    mongoose.disconnect();
-    console.log("Successfully parsed all URLs");
   });
 };
-
-var today = new Date();
-var urls = [
-  "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=" + today.getWeek() + "_" + today.getFullYear() + "&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=",
-  "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=" + (today.getWeek()+1) + "_" + today.getFullYear() + "&act=stg&pool=stg&show=plan&P.vx=lang&P.Print="
-];
 
 // start the magic
 startParser();
