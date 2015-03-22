@@ -13,10 +13,12 @@
     "cheerio": "latest",
     "cron": "latest",
     "express": "latest",
+    "express-validator": "latest",
     "moment": "latest",
     "mongoose": "latest",
     "morgan": "latest",
-    "request": "latest"
+    "request": "latest",
+    "util": "latest"
   },
   "scripts": {
     "test": "mocha"

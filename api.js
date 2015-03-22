@@ -3,7 +3,9 @@
 
 // import packages (api)
 var express = require("express");
+var expressValidator = require('express-validator');
 var bodyParser = require("body-parser");
+var util = require('util');
 var mongoose = require("mongoose");
 var morgan = require("morgan");
 
@@ -34,6 +36,7 @@ app.use(morgan("dev"));
 // configure body parser
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(expressValidator());
 
 // allow cross origin resource sharing
 app.use(function(req, res, next) {
@@ -109,11 +112,27 @@ router.route("/deadlines")
         // create instance of Deadline model
         console.log(req.body);
         var deadline = new Deadline();
+
+        // check inputs
+        req.assert("deadline", "deadline must be a valid date").isDate();
+        req.assert("deadline", "deadline must not be empty").notEmpty();
+        req.assert("info", "info must not be empty").notEmpty();
+        req.assert("shortLectureName", "shortLectureName must not be empty").notEmpty();
+        req.assert("group", "group must not be empty").notEmpty();
+
+        // if there are errors, send 400
+        var errors = req.validationErrors(true);
+        if (errors) {
+            res.status(400).send("There have been validation errors: " + util.inspect(errors));
+            return;
+        }
+
         // set attributes
         deadline.deadline = req.body.deadline;
         deadline.info = req.body.info;
         deadline.shortLectureName = req.body.shortLectureName;
         deadline.group = req.body.group;
+
         // save deadline in mongodb
         console.log(deadline);
         deadline.save(function(err, deadline) {
