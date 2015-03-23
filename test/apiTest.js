@@ -25,6 +25,7 @@ describe('Api', function(){
   });
 
   it('/ should return 200', function(done) {
+    this.timeout(4000);
     request("http://localhost:8088/api/v0/", function(error, response, html) {
       assert.equal(response.statusCode, 200);
       done();
@@ -32,6 +33,7 @@ describe('Api', function(){
   });
 
   it('/deadlines should return 200', function(done) {
+    this.timeout(4000);
     request("http://localhost:8088/api/v0/deadlines", function(error, response, html) {
       assert.equal(response.statusCode, 200);
       done();
@@ -39,6 +41,7 @@ describe('Api', function(){
   });
 
   it('/lectures should return 200', function(done) {
+    this.timeout(4000);
     request("http://localhost:8088/api/v0/lectures", function(error, response, html) {
       assert.equal(response.statusCode, 200);
       done();
