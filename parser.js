@@ -12,7 +12,7 @@ var crypto   = require("crypto");
 var weeksToParse = 2;
 
 
-var parse = function(html) { 
+var parse = function(html) {
   var table = null;
   var days = [];
   var timeTableGrid = [];
@@ -38,7 +38,7 @@ var parse = function(html) {
     }
   }
 
-  // iterate over each row and each cell  
+  // iterate over each row and each cell
   rows.each(function(i) {
     var cells = $(this).children("td:not(:first-child)");
 
@@ -64,7 +64,7 @@ var parse = function(html) {
 
           // parse the lectures td element
           var moreLectures = parseGroupsInLecture(currCell, days, j);
-          lectures = lectures.concat(moreLectures);          
+          lectures = lectures.concat(moreLectures);
         }
       }
     }
@@ -193,15 +193,15 @@ var hashCode = function(s){
 
 Object.defineProperty(Date.prototype, "getWeek", {
   value: function() {
-    var determinedate = new Date(); 
-    determinedate.setFullYear(this.getFullYear(), this.getMonth(), this.getDate()); 
-    var D = determinedate.getDay(); 
-    if(D === 0) { D = 7; } 
-    determinedate.setDate(determinedate.getDate() + (4 - D)); 
-    var YN = determinedate.getFullYear(); 
-    var ZBDoCY = Math.floor((determinedate.getTime() - new Date(YN, 0, 1, -6)) / 86400000); 
-    var WN = 1 + Math.floor(ZBDoCY / 7); 
-    return WN; 
+    var determinedate = new Date();
+    determinedate.setFullYear(this.getFullYear(), this.getMonth(), this.getDate());
+    var D = determinedate.getDay();
+    if(D === 0) { D = 7; }
+    determinedate.setDate(determinedate.getDate() + (4 - D));
+    var YN = determinedate.getFullYear();
+    var ZBDoCY = Math.floor((determinedate.getTime() - new Date(YN, 0, 1, -6)) / 86400000);
+    var WN = 1 + Math.floor(ZBDoCY / 7);
+    return WN;
   }
 });
 
@@ -212,7 +212,8 @@ var createUrls = function() {
     var today = new Date();
     var currentWeek = (today.getWeek() + i) % 53;
     var currentYear = today.getFullYear();
-    var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=" + currentWeek + "_" + currentYear + "&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=";
+    var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week="
+              + currentWeek + "_" + currentYear + "&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=";
     urls.push(url);
   }
   return urls;
@@ -242,7 +243,7 @@ var startParser = function() {
     async.each(urls, function(url, cb) {
       request(url, function(error, response, html) {
         if(!error) {
-          var lectures = parse(html); 
+          var lectures = parse(html);
           insertInDatabase(lectures, cb);
         }
       });

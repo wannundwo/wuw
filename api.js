@@ -188,3 +188,9 @@ app.use(apiBaseUrl, router);
 // start the server
 app.listen(port);
 console.log("magic happens at http://localhost:" + port + apiBaseUrl);
+
+var startApi = function() {
+    app.listen(port);
+}
+
+module.exports = { startApi: startApi };
