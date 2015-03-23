@@ -181,16 +181,21 @@ router.route("/deadlines/:deadline_id")
         });
     });
 
-
 // register the router & the base url
 app.use(apiBaseUrl, router);
 
 // start the server
-app.listen(port);
+var server = app.listen(port);
 console.log("magic happens at http://localhost:" + port + apiBaseUrl);
 
 var startApi = function() {
-    app.listen(port);
+  if (!server) {
+    server = app.listen(port);
+  }
 }
 
-module.exports = { startApi: startApi };
+var stopApi = function() {
+  server.close();
+}
+
+module.exports = { startApi: startApi, stopApi: stopApi };
