@@ -117,8 +117,8 @@ router.route("/deadlines")
         req.assert("deadline", "deadline must be a valid date").isDate();
         req.assert("deadline", "deadline must not be empty").notEmpty();
         req.assert("info", "info must not be empty").notEmpty();
-        req.assert("shortLectureName", "shortLectureName must not be empty").notEmpty();
-        req.assert("group", "group must not be empty").notEmpty();
+        //req.assert("shortLectureName", "shortLectureName must not be empty").notEmpty();
+        //req.assert("group", "group must not be empty").notEmpty();
 
         // if there are errors, send 400
         var errors = req.validationErrors(true);
