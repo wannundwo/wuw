@@ -82,6 +82,18 @@ router.route("/lectures")
         });
     });
 
+// on routes that end in /upcomingLectures
+router.route("/upcomingLectures")
+
+    // get all lectures (GET /$apiBaseUrl/lectures)
+    .get(function(req, res) {
+        Lecture.find({"endTime": {"$gte": new Date()}}).sort({startTime: 1}).exec(function(err, lectures) {
+            if (err) { res.status(500).send(err); }
+            res.status(200).json(lectures);
+            res.end();
+        });
+    });
+
 // on routes that end in /lectures/:lecture_id
 router.route("/lectures/:lecture_id")
 
