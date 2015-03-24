@@ -146,7 +146,6 @@ router.route("/deadlines")
         deadline.group = req.body.group;
 
         // save deadline in mongodb
-        console.log(deadline);
         deadline.save(function(err, deadline) {
             if (err) { res.send(err); }
             res.status(200).json({ message: "Deadline created!", id: deadline.id });
@@ -193,10 +192,21 @@ router.route("/deadlines/:deadline_id")
         });
     });
 
-
 // register the router & the base url
 app.use(apiBaseUrl, router);
 
 // start the server
-app.listen(port);
+var server = app.listen(port);
 console.log("magic happens at http://localhost:" + port + apiBaseUrl);
+
+var startApi = function() {
+  if (!server) {
+    server = app.listen(port);
+  }
+};
+
+var stopApi = function() {
+  server.close();
+};
+
+module.exports = { startApi: startApi, stopApi: stopApi };
