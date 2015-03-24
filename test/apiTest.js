@@ -24,16 +24,14 @@ describe('Api', function(){
     assert.equal(typeof api.startApi, 'function');
   });
 
-  /*it('/ should return 200', function(done) {
-    this.timeout(20000);
+  it('/ should return 200', function(done) {
     request("http://localhost:8088/api/v0/", function(error, response, html) {
       assert.equal(response.statusCode, 200);
       done();
     });
-  });*/
+  });
 
   it('/deadlines should return 200', function(done) {
-    this.timeout(20000);
     request("http://localhost:8088/api/v0/deadlines/", function(error, response, html) {
       assert.equal(response.statusCode, 200);
       done();
@@ -41,7 +39,6 @@ describe('Api', function(){
   });
 
   it('/lectures should return 200', function(done) {
-    this.timeout(20000);
     request("http://localhost:8088/api/v0/lectures", function(error, response, html) {
       assert.equal(response.statusCode, 200);
       done();
