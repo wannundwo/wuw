@@ -134,7 +134,6 @@ router.route("/deadlines")
         deadline.group = req.body.group;
 
         // save deadline in mongodb
-        console.log(deadline);
         deadline.save(function(err, deadline) {
             if (err) { res.send(err); }
             res.status(200).json({ message: "Deadline created!", id: deadline.id });
@@ -192,10 +191,10 @@ var startApi = function() {
   if (!server) {
     server = app.listen(port);
   }
-}
+};
 
 var stopApi = function() {
   server.close();
-}
+};
 
 module.exports = { startApi: startApi, stopApi: stopApi };
