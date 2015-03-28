@@ -1,5 +1,5 @@
 {
-  "name": "lsf-scraper",
+  "name": "wuw_server",
   "version": "0.0.1",
   "description": "scrape the lsf to collect curses with room and time.",
   "main": "api.js",
