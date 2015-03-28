@@ -117,7 +117,7 @@ var parseGroupsInLecture = function(html, days, dayPos) {
         lecture.lsfRoom = $(this).find("td.notiz a").first().text();
         lecture.group = parseGroup(lecture.lsfName);
         lecture.shortName = parseShortName(lecture.lsfName);
-        lecture.hashCode = hashCode(lecture.lsfName+lecture.lsfDate+lecture.lsfTime+lecture.lsfRoom);
+        lecture.hashCode = hashCode(lecture.lsfName+lecture.lsfDate+lecture.lsfTime+lecture.group);
 
         lectures.push(lecture);
     });
