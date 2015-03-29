@@ -9,7 +9,7 @@ var crypto   = require("crypto");
 
 
 // how many weeks should we parse?
-var weeksToParse = 1;
+var weeksToParse = 2;
 
 
 var parse = function(html) {
@@ -78,35 +78,27 @@ var insertInDatabase = function(lectures, cb) {
 
     // push every lecture to our db
     async.each(lectures, function(lecture, cb) {
-        // just get relevant info
-        var lsfRoom = lecture.lsfRoom.split(" ").pop(-1);
 
         // create Lecture from our Model
         var Lec = new Lecture();
         // set attributes
+        Lec._id = mongoose.Types.ObjectId(lecture.hashCode);
         Lec.date = lecture.start;
-        Lec.fullLectureName = lecture.lsfName;
         Lec.shortLectureName = lecture.shortName;
-        //Lec.room.push(lsfRoom);
         Lec.startTime = lecture.start;
         Lec.endTime = lecture.end;
-        Lec.group = lecture.group;
         Lec.hashCode = lecture.hashCode;
-        Lec._id = mongoose.Types.ObjectId(lecture.hashCode.substring(0, 12));
 
-        console.log(lsfRoom);
-
-        // upsert hack
+        // create an object from our document
         var upsertData = Lec.toObject();
+        // delete attributes to upsert
+        delete upsertData.rooms;
+        delete upsertData.groups;
+        // prepare data
+        var lsfRoom = lecture.lsfRoom.split(" ").pop(-1);
 
         // save lecture to db
-        //Lecture.update({ _id: Lec.id }, upsertData, { upsert: true }, cb);
-        Lecture.findOneAndUpdate({ _id: Lec.id }, { $push: { room: lsfRoom } }, { upsert: true }, cb);
-        
-
-
-
-        //Lecture.findOneAndUpdate({ hashCode: lecture.hashCode }, { $addToSet: { room: lecture.lsfRoom }}, { upsert: true }, cb);
+        Lecture.update({ _id: Lec.id }, { $set: upsertData, $addToSet: { rooms: lsfRoom, groups: lecture.group }  }, { upsert: true }, cb);
 
     }, function(err) {
         if (err) { console.log(err); }
@@ -135,8 +127,6 @@ var parseGroupsInLecture = function(html, days, dayPos) {
         lecture.group = parseGroup(lecture.lsfName);
         lecture.shortName = parseShortName(lecture.lsfName);
         lecture.hashCode = hashCode(lecture.shortName+lecture.lsfDate+lecture.lsfTime);
-
-        console.log();console.log();console.log(lecture);console.log();console.log();
 
         lectures.push(lecture);
     });
@@ -205,11 +195,13 @@ var getDaysInThisWeek = function($) {
     return days;
 };
 
+// simple hash-algo to generate 12 byte long objectId
 var hashCode = function(s){
-        var hash = crypto.createHash('md5').update(s).digest('hex');
+        var hash = crypto.createHash('md5').update(s).digest('hex').substring(0, 12);
         return hash;
 };
 
+// get the calendar week
 Object.defineProperty(Date.prototype, "getWeek", {
     value: function() {
         var determinedate = new Date();
@@ -231,8 +223,7 @@ var createUrls = function() {
         var today = new Date();
         var currentWeek = (today.getWeek() + i) % 53;
         var currentYear = today.getFullYear();
-        var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week="
-                            + currentWeek + "_" + currentYear + "&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=";
+        var url = "https://lsf.hft-stuttgart.de/qisserver/rds?state=wplan&k_abstgv.abstgvnr=262&week=" + currentWeek + "_" + currentYear + "&act=stg&pool=stg&show=plan&P.vx=lang&P.Print=";
         urls.push(url);
     }
     return urls;
