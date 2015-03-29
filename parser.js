@@ -9,7 +9,7 @@ var crypto   = require("crypto");
 
 
 // how many weeks should we parse?
-var weeksToParse = 2;
+var weeksToParse = 1;
 
 
 var parse = function(html) {
@@ -78,19 +78,36 @@ var insertInDatabase = function(lectures, cb) {
 
     // push every lecture to our db
     async.each(lectures, function(lecture, cb) {
+        // just get relevant info
+        var lsfRoom = lecture.lsfRoom.split(" ").pop(-1);
+
         // create Lecture from our Model
         var Lec = new Lecture();
         // set attributes
         Lec.date = lecture.start;
         Lec.fullLectureName = lecture.lsfName;
         Lec.shortLectureName = lecture.shortName;
-        Lec.room = lecture.lsfRoom;
+        //Lec.room.push(lsfRoom);
         Lec.startTime = lecture.start;
         Lec.endTime = lecture.end;
         Lec.group = lecture.group;
         Lec.hashCode = lecture.hashCode;
+        Lec._id = mongoose.Types.ObjectId(lecture.hashCode.substring(0, 12));
+
+        console.log(lsfRoom);
+
+        // upsert hack
+        var upsertData = Lec.toObject();
+
         // save lecture to db
-        Lec.save(cb);
+        //Lecture.update({ _id: Lec.id }, upsertData, { upsert: true }, cb);
+        Lecture.findOneAndUpdate({ _id: Lec.id }, { $push: { room: lsfRoom } }, { upsert: true }, cb);
+        
+
+
+
+        //Lecture.findOneAndUpdate({ hashCode: lecture.hashCode }, { $addToSet: { room: lecture.lsfRoom }}, { upsert: true }, cb);
+
     }, function(err) {
         if (err) { console.log(err); }
         console.log("Added " + lectures.length + " lectures in the database...");
@@ -117,7 +134,9 @@ var parseGroupsInLecture = function(html, days, dayPos) {
         lecture.lsfRoom = $(this).find("td.notiz a").first().text();
         lecture.group = parseGroup(lecture.lsfName);
         lecture.shortName = parseShortName(lecture.lsfName);
-        lecture.hashCode = hashCode(lecture.lsfName+lecture.lsfDate+lecture.lsfTime+lecture.group);
+        lecture.hashCode = hashCode(lecture.shortName+lecture.lsfDate+lecture.lsfTime);
+
+        console.log();console.log();console.log(lecture);console.log();console.log();
 
         lectures.push(lecture);
     });
