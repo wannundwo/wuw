@@ -2,13 +2,11 @@ var mongoose = require("mongoose");
 
 // create mongodb schema for our lectures
 var LectureSchema = new mongoose.Schema({
-    fullLectureName: String,
-    shortLectureName: String,
-    room: String,
+    lectureName: String,
+    rooms: [String],
+    groups: [String],
     startTime: Date,
-    endTime: Date,
-    group: String,
-    hashCode: { type: String, index: { unique: true }}
+    endTime: Date
 });
 
 // create model from our schema & export it
