@@ -202,13 +202,13 @@ var server = app.listen(port);
 console.log("magic happens at http://localhost:" + port + apiBaseUrl);
 
 var startApi = function() {
-  if (!server) {
-    server = app.listen(port);
-  }
+    if (!server) {
+        server = app.listen(port);
+    }
 };
 
 var stopApi = function() {
-  server.close();
+    server.close();
 };
 
 module.exports = { startApi: startApi, stopApi: stopApi };
