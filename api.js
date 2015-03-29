@@ -211,7 +211,7 @@ router.route("/rooms")
 // on routes that end in /freeRooms
 router.route("/freeRooms")
 
-    // get all rooms (GET /$apiBaseUrl/rooms)
+    // get all (probably) free rooms (GET /$apiBaseUrl/freeRooms)
     .get(function(req, res) {
 
         Lecture.aggregate([ { $unwind: "$rooms" }, { $group: { _id: "rooms", rooms: { $addToSet: "$rooms" } } } ]).exec(function(err, rooms) {
