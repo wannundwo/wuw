@@ -134,31 +134,31 @@ var parseGroupsInLecture = function(html, days, dayPos) {
 };
 
 var parseGroup = function(s) {
-        return s.split(" ")[0];
+    return s.split(" ")[0];
 };
 
 var parseShortName = function(s) {
-        var parts = s.split(" ");
-        parts.shift();
-        var shortName = parts.join(" ");
-        return shortName;
+    var parts = s.split(" ");
+    parts.shift();
+    var shortName = parts.join(" ");
+    return shortName;
 };
 
 var parseStartEnd = function(date, time) {
-        var start = null;
-        var end = null;
-        var timeString = time.split(" ")[0];
-        var starTimeString = timeString.split("-")[0];
-        var endTimeString = timeString.split("-")[1];
+    var start = null;
+    var end = null;
+    var timeString = time.split(" ")[0];
+    var starTimeString = timeString.split("-")[0];
+    var endTimeString = timeString.split("-")[1];
 
-        var dateString = date.split(" ")[1];
-        var startString = dateString + " " + starTimeString;
-        var endString  = dateString + " " + endTimeString;
+    var dateString = date.split(" ")[1];
+    var startString = dateString + " " + starTimeString;
+    var endString  = dateString + " " + endTimeString;
 
-        start = moment(startString, "DD-MM-YYYY HH:mm");
-        end = moment(endString, "DD-MM-YYYY HH:mm");
+    start = moment(startString, "DD-MM-YYYY HH:mm");
+    end = moment(endString, "DD-MM-YYYY HH:mm");
 
-        return { start: start, end: end };
+    return { start: start, end: end };
 };
 
 var trimProperty = function(s) {
