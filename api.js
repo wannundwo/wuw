@@ -45,6 +45,7 @@ app.use(function(req, res, next) {
     next();
 });
 
+
 // connect to mongodb
 mongoose.connect("mongodb://localhost:27017/wuw");
 
@@ -76,18 +77,6 @@ router.route("/lectures")
     // get all lectures (GET /$apiBaseUrl/lectures)
     .get(function(req, res) {
         Lecture.find({}).sort({startTime: 1}).exec(function(err, lectures) {
-            if (err) { res.status(500).send(err); }
-            res.status(200).json(lectures);
-            res.end();
-        });
-    });
-
-// on routes that end in /upcomingLectures
-router.route("/upcomingLectures")
-
-    // get all lectures (GET /$apiBaseUrl/lectures)
-    .get(function(req, res) {
-        Lecture.find({"endTime": {"$gte": new Date()}}).sort({startTime: 1}).exec(function(err, lectures) {
             if (err) { res.status(500).send(err); }
             res.status(200).json(lectures);
             res.end();
@@ -193,6 +182,44 @@ router.route("/deadlines/:deadline_id")
             res.status(200).json({ message: "Deadline successfully deleted" });
         });
     });
+
+
+// on routes that end in /upcomingLectures
+router.route("/upcomingLectures")
+
+    // get upcoming lectures (GET /$apiBaseUrl/upcomingLectures)
+    .get(function(req, res) {
+        Lecture.find({"endTime": {"$gte": new Date()}}).sort({startTime: 1}).exec(function(err, lectures) {
+            if (err) { res.status(500).send(err); }
+            res.status(200).json(lectures);
+            res.end();
+        });
+    });
+
+// on routes that end in /rooms
+router.route("/rooms")
+
+    // get all rooms (GET /$apiBaseUrl/rooms)
+    .get(function(req, res) {
+        Lecture.aggregate([ { $unwind: "$rooms" }, { $group: { _id: "rooms", rooms: { $addToSet: "$rooms" } } } ]).exec(function(err, rooms) {
+            if (err) { res.status(500).send(err); }
+            res.status(200).json(rooms);
+            res.end();
+        });
+    });
+
+// on routes that end in /groups
+router.route("/groups")
+
+    // get all groups (GET /$apiBaseUrl/groups)
+    .get(function(req, res) {
+        Lecture.aggregate([ { $unwind: "$groups" }, { $group: { _id: "groups", groups: { $addToSet: "$groups" } } } ]).exec(function(err, groups) {
+            if (err) { res.status(500).send(err); }
+            res.status(200).json(groups);
+            res.end();
+        });
+    });
+
 
 // register the router & the base url
 app.use(apiBaseUrl, router);
