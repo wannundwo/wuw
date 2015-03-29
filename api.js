@@ -203,8 +203,30 @@ router.route("/rooms")
     .get(function(req, res) {
         Lecture.aggregate([ { $unwind: "$rooms" }, { $group: { _id: "rooms", rooms: { $addToSet: "$rooms" } } } ]).exec(function(err, rooms) {
             if (err) { res.status(500).send(err); }
-            res.status(200).json(rooms);
+            res.status(200).json(rooms[0].rooms);
             res.end();
+        });
+    });
+
+// on routes that end in /freeRooms
+router.route("/freeRooms")
+
+    // get all rooms (GET /$apiBaseUrl/rooms)
+    .get(function(req, res) {
+
+        Lecture.aggregate([ { $unwind: "$rooms" }, { $group: { _id: "rooms", rooms: { $addToSet: "$rooms" } } } ]).exec(function(err, rooms) {
+            if (err) { res.status(500).send(err); }
+
+            Lecture.aggregate([ { $match: { startTime: { "$lte": new Date() }, endTime: { "$gte": new Date() } } }, { $unwind: "$rooms" }, { $group: { _id: "rooms", rooms: { $addToSet: "$rooms" } } } ]).exec(function(err, usedRooms) {
+                if (err) { res.status(500).send(err); }
+
+                var freeRooms = rooms[0].rooms.filter(function(e) {
+                    return (usedRooms[0].rooms.indexOf(e) < 0);
+                });
+
+                res.status(200).json(freeRooms);
+                res.end();
+            });
         });
     });
 
@@ -215,7 +237,7 @@ router.route("/groups")
     .get(function(req, res) {
         Lecture.aggregate([ { $unwind: "$groups" }, { $group: { _id: "groups", groups: { $addToSet: "$groups" } } } ]).exec(function(err, groups) {
             if (err) { res.status(500).send(err); }
-            res.status(200).json(groups);
+            res.status(200).json(groups[0].groups);
             res.end();
         });
     });
