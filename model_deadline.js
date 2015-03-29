@@ -5,7 +5,8 @@ var DeadlineSchema = new mongoose.Schema({
     info: String,
     deadline: Date, // this is the "Abgabetermin" <- lol! :D
     shortLectureName: String,
-    group: String
+    group: String,
+    createdBy: String
 });
 
 // create model from our schema & export it

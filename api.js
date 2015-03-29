@@ -131,6 +131,7 @@ router.route("/deadlines")
         req.assert("info", "info must not be empty").notEmpty();
         //req.assert("shortLectureName", "shortLectureName must not be empty").notEmpty();
         //req.assert("group", "group must not be empty").notEmpty();
+        //req.assert("uuid", "oh kiddie...").notEmpty();
 
         // if there are errors, send 400
         var errors = req.validationErrors(true);
@@ -144,6 +145,7 @@ router.route("/deadlines")
         deadline.info = req.body.info;
         deadline.shortLectureName = req.body.shortLectureName;
         deadline.group = req.body.group;
+        deadline.createdBy = req.body.uuid;
 
         // save deadline in mongodb
         deadline.save(function(err, deadline) {
