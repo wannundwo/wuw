@@ -84,16 +84,18 @@ var insertInDatabase = function(lectures, cb) {
         // set attributes
         Lec._id = mongoose.Types.ObjectId(lecture.hashCode);
         Lec.date = lecture.start;
-        Lec.shortLectureName = lecture.shortName;
+        Lec.lectureName = lecture.shortName;
         Lec.startTime = lecture.start;
         Lec.endTime = lecture.end;
         Lec.hashCode = lecture.hashCode;
 
         // create an object from our document
         var upsertData = Lec.toObject();
+
         // delete attributes to upsert
         delete upsertData.rooms;
         delete upsertData.groups;
+
         // prepare data
         var lsfRoom = lecture.lsfRoom.split(" ").pop(-1);
 

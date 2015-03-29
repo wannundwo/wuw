@@ -2,7 +2,7 @@ var mongoose = require("mongoose");
 
 // create mongodb schema for our lectures
 var LectureSchema = new mongoose.Schema({
-    shortLectureName: String,
+    lectureName: String,
     rooms: [String],
     groups: [String],
     startTime: Date,
