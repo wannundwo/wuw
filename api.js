@@ -221,7 +221,7 @@ router.route("/freeRooms")
                 if (err) { res.status(500).send(err); }
 
                 var freeRooms;
-                if(usedRooms[0].rooms) {
+                if(usedRooms[0] && usedRooms[0].rooms) {
                     freeRooms = rooms[0].rooms.filter(function(e) {
                         return (usedRooms[0].rooms.indexOf(e) < 0);
                     });
