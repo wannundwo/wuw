@@ -220,9 +220,14 @@ router.route("/freeRooms")
             Lecture.aggregate([ { $match: { startTime: { "$lte": new Date() }, endTime: { "$gte": new Date() } } }, { $unwind: "$rooms" }, { $group: { _id: "rooms", rooms: { $addToSet: "$rooms" } } } ]).exec(function(err, usedRooms) {
                 if (err) { res.status(500).send(err); }
 
-                var freeRooms = rooms[0].rooms.filter(function(e) {
-                    return (usedRooms[0].rooms.indexOf(e) < 0);
-                });
+                var freeRooms;
+                if(usedRooms[0].rooms && usedRooms[0].rooms.length > 0) {
+                    freeRooms = rooms[0].rooms.filter(function(e) {
+                        return (usedRooms[0].rooms.indexOf(e) < 0);
+                    });
+                } else {
+                    freeRooms = rooms[0].rooms;
+                }
 
                 res.status(200).json(freeRooms);
                 res.end();
