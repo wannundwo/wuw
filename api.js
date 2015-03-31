@@ -9,17 +9,6 @@ var util = require('util');
 var mongoose = require("mongoose");
 var morgan = require("morgan");
 
-// import packages (parser)
-// var cronjob = require('cron').CronJob;
-// var parser = require("./parser");
-
-
-// create cronjob for parser
-// new cronjob("0 */15 * * * *", function(){
-//     console.log(new Date() + ": starting parser...");
-//     parser.startParser();
-// }, null, true, "Europe/Berlin");
-
 
 // create the express app & configure port
 var app = express();
@@ -59,7 +48,6 @@ var router = express.Router();
 
 // middleware to use for all requests
 router.use(function(req, res, next) {
-    // do logging
     //console.log("Something is happening...");
     next();
 });
@@ -118,7 +106,7 @@ router.route("/deadlines")
         req.assert("deadline", "deadline must be a valid date").isDate();
         req.assert("deadline", "deadline must not be empty").notEmpty();
         req.assert("info", "info must not be empty").notEmpty();
-        //req.assert("shortLectureName", "shortLectureName must not be empty").notEmpty();
+        //req.assert("lectureName", "lectureName must not be empty").notEmpty();
         //req.assert("group", "group must not be empty").notEmpty();
         //req.assert("uuid", "oh kiddie...").notEmpty();
 
@@ -201,6 +189,7 @@ router.route("/rooms")
 
     // get all rooms (GET /$apiBaseUrl/rooms)
     .get(function(req, res) {
+        // querys for all rooms and aggregate to one doc
         Lecture.aggregate([ { $unwind: "$rooms" }, { $group: { _id: "rooms", rooms: { $addToSet: "$rooms" } } } ]).exec(function(err, rooms) {
             if (err) { res.status(500).send(err); }
             res.status(200).json(rooms[0].rooms);
@@ -214,18 +203,22 @@ router.route("/freeRooms")
     // get all (probably) free rooms (GET /$apiBaseUrl/freeRooms)
     .get(function(req, res) {
 
+        // get all rooms (in db)
         Lecture.aggregate([ { $unwind: "$rooms" }, { $group: { _id: "rooms", rooms: { $addToSet: "$rooms" } } } ]).exec(function(err, rooms) {
             if (err) { res.status(500).send(err); }
 
+            // get rooms currently in use
             Lecture.aggregate([ { $match: { startTime: { "$lte": new Date() }, endTime: { "$gte": new Date() } } }, { $unwind: "$rooms" }, { $group: { _id: "rooms", rooms: { $addToSet: "$rooms" } } } ]).exec(function(err, usedRooms) {
                 if (err) { res.status(500).send(err); }
 
+                // filter used rooms by comparing both arrays
                 var freeRooms;
                 if(usedRooms[0] && usedRooms[0].rooms) {
                     freeRooms = rooms[0].rooms.filter(function(e) {
                         return (usedRooms[0].rooms.indexOf(e) < 0);
                     });
                 } else {
+                    // all rooms free
                     freeRooms = rooms[0].rooms;
                 }
 
@@ -240,6 +233,7 @@ router.route("/groups")
 
     // get all groups (GET /$apiBaseUrl/groups)
     .get(function(req, res) {
+        // querys for all groups and aggregate to one doc
         Lecture.aggregate([ { $unwind: "$groups" }, { $group: { _id: "groups", groups: { $addToSet: "$groups" } } } ]).exec(function(err, groups) {
             if (err) { res.status(500).send(err); }
             res.status(200).json(groups[0].groups);
@@ -265,4 +259,5 @@ var stopApi = function() {
     server.close();
 };
 
+// export functions
 module.exports = { startApi: startApi, stopApi: stopApi };
