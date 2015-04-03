@@ -15,11 +15,11 @@ var fs = require('fs');
 // ssl
 var ca; var file;
 var files = ["ssl-ca.crt", "ssl-intermediate.crt"];
-for (file in files) {
+files.forEach(function(file) {
     if (file) {
         ca += fs.readFileSync("./" + file);
     }
-}
+});
 var key = fs.readFileSync('./ssl-wuw.key');
 var cert = fs.readFileSync('./ssl-wuw.crt');
 // load passphrase from file
