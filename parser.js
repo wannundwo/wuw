@@ -72,6 +72,22 @@ var parse = function(html) {
     return lectures;
 };
 
+// create a color for str (eg. a lecture name)
+var stringToColor = function(str) {
+    var hash = 0;
+    var color = '#';
+    // str to hash
+    for (var i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    // hash to hex
+    for (var j = 0; j < 3; j++) {
+        var value = (hash >> (j * 8)) & 0xFF;
+        color += ('00' + value.toString(16)).substr(-2);
+    }
+    return color;
+};
+
 var insertInDatabase = function(lectures, cb) {
     // create models from our schemas
     var Lecture = require("./model_lecture");
@@ -84,10 +100,11 @@ var insertInDatabase = function(lectures, cb) {
         // set attributes
         Lec._id = mongoose.Types.ObjectId(lecture.hashCode);
         Lec.date = lecture.start;
-        Lec.lectureName = lecture.shortName;
+        Lec.lectureName = lecture.lectureName;
         Lec.startTime = lecture.start;
         Lec.endTime = lecture.end;
         Lec.hashCode = lecture.hashCode;
+        Lec.color = lecture.color;
 
         // create an object from our document
         var upsertData = Lec.toObject();
@@ -127,8 +144,9 @@ var parseGroupsInLecture = function(html, days, dayPos) {
         lecture.lsfTime = time;
         lecture.lsfRoom = $(this).find("td.notiz a").first().text();
         lecture.group = parseGroup(lecture.lsfName);
-        lecture.shortName = parseShortName(lecture.lsfName);
-        lecture.hashCode = hashCode(lecture.shortName+lecture.lsfDate+lecture.lsfTime);
+        lecture.lectureName = parseShortName(lecture.lsfName);
+        lecture.hashCode = hashCode(lecture.lectureName+lecture.lsfDate+lecture.lsfTime);
+        lecture.color = stringToColor(lecture.lectureName);
 
         lectures.push(lecture);
     });
