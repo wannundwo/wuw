@@ -13,19 +13,11 @@ var fs = require('fs');
 
 
 // ssl
-var ca; var file;
-var files = ["ssl-ca.crt", "ssl-intermediate.crt"];
-files.forEach(function(file) {
-    if (file) {
-        ca += fs.readFileSync("./" + file);
-    }
-});
 var key = fs.readFileSync('./ssl-wuw.key');
 var cert = fs.readFileSync('./ssl-wuw.crt');
 // load passphrase from file
 var pass = require("./ssl-pass");
 var https_options = {
-    ca: ca,
     key: key,
     cert: cert,
     passphrase: pass.passphrase
