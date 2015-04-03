@@ -8,6 +8,20 @@ var bodyParser = require("body-parser");
 var util = require('util');
 var mongoose = require("mongoose");
 var morgan = require("morgan");
+var https = require('https');
+var fs = require('fs');
+
+
+// ssl
+var key = fs.readFileSync('./ssl-wuw.key');
+var cert = fs.readFileSync('./ssl-wuw.crt');
+// load passphrase from file
+var pass = require("./ssl-pass");
+var https_options = {
+    key: key,
+    cert: cert,
+    passphrase: pass.passphrase
+};
 
 
 // create the express app & configure port
@@ -245,9 +259,9 @@ router.route("/groups")
 // register the router & the base url
 app.use(apiBaseUrl, router);
 
-// start the server
-var server = app.listen(port);
-console.log("magic happens at http://localhost:" + port + apiBaseUrl);
+// start the https server
+var server = https.createServer(https_options, app).listen(port);
+console.log("magic happens at https://localhost:" + port + apiBaseUrl);
 
 var startApi = function() {
     if (!server) {
