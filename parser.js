@@ -108,7 +108,7 @@ var stringToColor = function(str) {
         return color;
     };
 
-    return shade(int_to_rgba(hash(str)), 10);
+    return shade(int_to_rgba(hash(str)), 35);
 };
 
 var insertInDatabase = function(lectures, cb) {
