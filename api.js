@@ -13,16 +13,20 @@ var fs = require('fs');
 
 
 // ssl
-var key = fs.readFileSync('./ssl-wuw.key');
-var cert = fs.readFileSync('./ssl-wuw.crt');
-// load passphrase from file
-var pass = require("./ssl-pass");
-var https_options = {
-    key: key,
-    cert: cert,
-    passphrase: pass.passphrase
-};
-
+try {
+    var use_ssl = true;
+    var key = fs.readFileSync('./ssl-wuw.key');
+    var cert = fs.readFileSync('./ssl-wuw.crt');
+    // load passphrase from file
+    var pass = require("./ssl-pass");
+    var https_options = {
+        key: key,
+        cert: cert,
+        passphrase: pass.passphrase
+    };
+} catch(err) {
+    if (err) { console.log("no ssl certificate present, falling back to http..."); use_ssl = false; }
+}
 
 // create the express app & configure port
 var app = express();
@@ -260,8 +264,13 @@ router.route("/groups")
 app.use(apiBaseUrl, router);
 
 // start the https server
-var server = https.createServer(https_options, app).listen(port);
-console.log("magic happens at https://localhost:" + port + apiBaseUrl);
+if(use_ssl) {
+    var server = https.createServer(https_options, app).listen(port);
+    console.log("magic happens at https://localhost:" + port + apiBaseUrl);
+} else {
+    var server = app.listen(port);
+    console.log("magic happens at http://localhost:" + port + apiBaseUrl);
+}
 
 var startApi = function() {
     if (!server) {
