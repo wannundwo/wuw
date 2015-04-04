@@ -6,7 +6,8 @@ var LectureSchema = new mongoose.Schema({
     rooms: [String],
     groups: [String],
     startTime: Date,
-    endTime: Date
+    endTime: Date,
+    color: String
 });
 
 // create model from our schema & export it

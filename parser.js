@@ -1,3 +1,5 @@
+/*jshint bitwise: false*/
+
 "use strict";
 
 var request  = require("request");
@@ -72,6 +74,43 @@ var parse = function(html) {
     return lectures;
 };
 
+var stringToColor = function(str) {
+
+    // Generate a Hash for the String
+    var hash = function(word) {
+        var h = 0;
+        for (var i = 0; i < word.length; i++) {
+            h = word.charCodeAt(i) + ((h << 4) - h);
+        }
+        return h;
+    };
+
+    // Change the darkness or lightness
+    var shade = function(color, prc) {
+        var num = parseInt(color, 16),
+            amt = Math.round(2.55 * prc),
+            R = (num >> 16) + amt,
+            G = (num >> 8 & 0x00FF) + amt,
+            B = (num & 0x0000FF) + amt;
+        return (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+            (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+            (B < 255 ? B < 1 ? 0 : B : 255))
+            .toString(16)
+            .slice(1);
+    };
+
+    // Convert init to an RGBA
+    var int_to_rgba = function(i) {
+        var color = ((i >> 24) & 0xFF).toString(16) +
+            ((i >> 16) & 0xFF).toString(16) +
+            ((i >> 8) & 0xFF).toString(16) +
+            (i & 0xFF).toString(16);
+        return color;
+    };
+
+    return shade(int_to_rgba(hash(str)), 10);
+};
+
 var insertInDatabase = function(lectures, cb) {
     // create models from our schemas
     var Lecture = require("./model_lecture");
@@ -84,10 +123,11 @@ var insertInDatabase = function(lectures, cb) {
         // set attributes
         Lec._id = mongoose.Types.ObjectId(lecture.hashCode);
         Lec.date = lecture.start;
-        Lec.lectureName = lecture.shortName;
+        Lec.lectureName = lecture.lectureName;
         Lec.startTime = lecture.start;
         Lec.endTime = lecture.end;
         Lec.hashCode = lecture.hashCode;
+        Lec.color = lecture.color;
 
         // create an object from our document
         var upsertData = Lec.toObject();
@@ -127,8 +167,9 @@ var parseGroupsInLecture = function(html, days, dayPos) {
         lecture.lsfTime = time;
         lecture.lsfRoom = $(this).find("td.notiz a").first().text();
         lecture.group = parseGroup(lecture.lsfName);
-        lecture.shortName = parseShortName(lecture.lsfName);
-        lecture.hashCode = hashCode(lecture.shortName+lecture.lsfDate+lecture.lsfTime);
+        lecture.lectureName = parseShortName(lecture.lsfName);
+        lecture.hashCode = hashCode(lecture.lectureName+lecture.lsfDate+lecture.lsfTime);
+        lecture.color = '#' + stringToColor(lecture.lectureName);
 
         lectures.push(lecture);
     });
