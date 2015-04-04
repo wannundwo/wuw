@@ -30,7 +30,7 @@ try {
 
 // create the express app & configure port
 var app = express();
-var port = process.env.PORT || 8088;
+var port = process.env.PORT || 4342;
 
 // api version & url
 var apiVersion = 0;
