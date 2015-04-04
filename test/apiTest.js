@@ -6,6 +6,8 @@ var parser = require('../parser');
 var fs = require('fs');
 var request = require('request');
 
+var apiBaseUrl = "http://localhost:4342/api/v0/";
+
 describe('Api', function(){
 
   before(function () {
@@ -26,21 +28,21 @@ describe('Api', function(){
 
   describe('http', function() {
     it('/ should return 200', function(done) {
-      request("http://localhost:8088/api/v0/", function(error, response, html) {
+      request(apiBaseUrl, function(error, response, html) {
         assert.equal(response.statusCode, 200);
         done();
       });
     });
 
     it('/deadlines should return 200', function(done) {
-      request("http://localhost:8088/api/v0/deadlines/", function(error, response, html) {
+      request(apiBaseUrl + "deadlines/", function(error, response, html) {
         assert.equal(response.statusCode, 200);
         done();
       });
     });
 
     it('/lectures should return 200', function(done) {
-      request("http://localhost:8088/api/v0/lectures", function(error, response, html) {
+      request(apiBaseUrl + "lectures", function(error, response, html) {
         assert.equal(response.statusCode, 200);
         done();
       });
@@ -54,7 +56,7 @@ describe('Api', function(){
         };
 
         var conf = {
-            url: 'http://localhost:8088/api/v0/deadlines/',
+            url: apiBaseUrl + 'deadlines/',
             form: deadline
         };
 
@@ -68,7 +70,7 @@ describe('Api', function(){
     });
 
     it('it should have deadline', function(done) {
-        var url = 'http://localhost:8088/api/v0/deadlines/' + id;
+        var url = apiBaseUrl + 'deadlines/' + id;
         request(url, function(error, response, html) {
             assert.equal(response.statusCode, 200);
             var info = JSON.parse(html).info;
