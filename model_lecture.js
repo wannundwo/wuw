@@ -1,4 +1,5 @@
 var mongoose = require("mongoose");
+var color = require("./color");
 
 // create mongodb schema for our lectures
 var LectureSchema = new mongoose.Schema({
@@ -6,8 +7,14 @@ var LectureSchema = new mongoose.Schema({
     rooms: [String],
     groups: [String],
     startTime: Date,
-    endTime: Date,
-    color: String
+    endTime: Date
+}, {
+    toObject: { virtuals: true },
+    toJSON: { virtuals: true }
+});
+
+LectureSchema.virtual('color').get(function () {
+    return color.stringToColor(this.lectureName);
 });
 
 // create model from our schema & export it
