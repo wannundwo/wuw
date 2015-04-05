@@ -3,9 +3,7 @@
 "use strict";
 var stringToColor = function(str) {
 
-    console.log("yyyeeees");
     if (typeof str === "undefined") {
-        console.log("yyyeeees");
         return "#444444";
     }
 
