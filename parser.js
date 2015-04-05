@@ -1,5 +1,3 @@
-/*jshint bitwise: false*/
-
 "use strict";
 
 var request  = require("request");
