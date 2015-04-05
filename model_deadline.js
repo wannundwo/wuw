@@ -15,7 +15,7 @@ var DeadlineSchema = new mongoose.Schema({
     toJSON: { virtuals: true }
 });
 
-DeadlineSchema.virtual('color').get(function () {
+DeadlineSchema.virtual("color").get(function () {
     return color.stringToColor(this.group);
 });
 

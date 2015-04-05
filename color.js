@@ -1,6 +1,7 @@
 /*jshint bitwise: false*/
 
 "use strict";
+
 var stringToColor = function(str) {
 
     if (typeof str === "undefined") {

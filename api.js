@@ -3,20 +3,20 @@
 
 // import packages (api)
 var express = require("express");
-var expressValidator = require('express-validator');
+var expressValidator = require("express-validator");
 var bodyParser = require("body-parser");
-var util = require('util');
+var util = require("util");
 var mongoose = require("mongoose");
 var morgan = require("morgan");
-var https = require('https');
-var fs = require('fs');
+var https = require("https");
+var fs = require("fs");
 
 
 // ssl
 try {
     var use_ssl = true;
-    var key = fs.readFileSync('./ssl-wuw.key');
-    var cert = fs.readFileSync('./ssl-wuw.crt');
+    var key = fs.readFileSync("./ssl-wuw.key");
+    var cert = fs.readFileSync("./ssl-wuw.crt");
     // load passphrase from file
     var pass = require("./ssl-pass");
     var https_options = {

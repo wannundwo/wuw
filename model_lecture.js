@@ -15,7 +15,7 @@ var LectureSchema = new mongoose.Schema({
     toJSON: { virtuals: true }
 });
 
-LectureSchema.virtual('color').get(function () {
+LectureSchema.virtual("color").get(function () {
     return color.stringToColor(this.lectureName);
 });
 
