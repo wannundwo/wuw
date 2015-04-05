@@ -11,7 +11,7 @@ var crypto   = require("crypto");
 
 
 // how many weeks should we parse?
-var weeksToParse = 2;
+var weeksToParse = 3;
 
 
 var parse = function(html) {
