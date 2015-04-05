@@ -48,16 +48,5 @@ describe('Parser', function(){
                 done();
             });
         });
-
-        it('GdI should have a color', function(done) {
-            fs.readFile('./test/data/ss15_if2.html', 'utf8', function (err, html) {
-                if (err) { return console.log(err); }
-                var lectures = parser.parse(html);
-                var gdi = lectures[11];
-                assert.notEqual('undefined', typeof gdi.color);
-                assert.notEqual('#', typeof gdi.color[0]); // we expect a hex value #....
-                done();
-            });
-        });
     });
 });
