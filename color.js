@@ -1,5 +1,6 @@
 "use strict";
 var Please = require("pleasejs");
+var crypto   = require("crypto");
 
 var stringToColor = function(str) {
 
@@ -7,10 +8,12 @@ var stringToColor = function(str) {
         return "#444444";
     }
 
-    return Please.make_color({
-        golden: false,
-        seed: str
+    var hash = crypto.createHash('md5').update(str);
+    var color = Please.make_color({
+        seed: hash,
+        saturation: 0.5
     })[0];
+    return color;
 };
 
 module.exports = { stringToColor: stringToColor };
