@@ -18,7 +18,8 @@
     "mongoose": "latest",
     "morgan": "latest",
     "request": "latest",
-    "util": "latest"
+    "util": "latest",
+    "pleasejs": "latest"
   },
   "scripts": {
     "test": "mocha"
