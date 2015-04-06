@@ -8,10 +8,9 @@ var stringToColor = function(str) {
         return "#444444";
     }
 
-    var hash = crypto.createHash('md5').update(str);
     var color = Please.make_color({
-        seed: hash,
-        saturation: 0.5
+        saturation: 0.6,
+        seed: str,
     })[0];
     return color;
 };
