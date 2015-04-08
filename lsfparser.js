@@ -59,8 +59,13 @@ var parse = function(html, cb) {
         delete upsertData.rooms;
         delete upsertData.groups;
 
-        // save lecture to db & call callback
-        Lecture.update({ _id: Lec.id }, { $set: upsertData, $addToSet: { rooms: room, groups: group }  }, { upsert: true }, trcb);
+        // lectures without a group/room are useless...
+        if(group !== "" && room !== "") {
+            // save lecture to db & call callback
+            Lecture.update({ _id: Lec.id }, { $set: upsertData, $addToSet: { rooms: room, groups: group }  }, { upsert: true }, trcb);
+        } else {
+            trcb();
+        }
     }, function() {
         // day done
         cb();
