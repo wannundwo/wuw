@@ -27,6 +27,9 @@ var parse = function(html, cb) {
 
     // get date for this day
     var curDate = $("h2").text().split(", ")[1];
+    var curDateArr = curDate.split(".");
+    var intDate = curDateArr[1] + "/" + curDateArr[0] + "/" + curDateArr[2];
+
 
     // parse each single lecture
     async.each($("tr"), function(lectureLine, trcb) {
@@ -47,8 +50,8 @@ var parse = function(html, cb) {
         var Lec = new Lecture();
         // set attributes
         Lec.lectureName = $(lectureLine).children().eq(3).text().trim();
-        Lec.startTime = new Date(curDate + " " + $(lectureLine).children().eq(0).text().trim());
-        Lec.endTime = new Date(curDate + " " + $(lectureLine).children().eq(1).text().trim());
+        Lec.startTime = new Date(intDate + " " + $(lectureLine).children().eq(0).text().trim());
+        Lec.endTime = new Date(intDate + " " + $(lectureLine).children().eq(1).text().trim());
         Lec.docents = docents;
         Lec.hashCode = hashCode(Lec.lectureName+curDate+Lec.startTime);
         Lec._id = mongoose.Types.ObjectId(Lec.hashCode);
