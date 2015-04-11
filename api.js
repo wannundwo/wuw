@@ -246,18 +246,31 @@ router.route("/freeRooms")
         });
     });
 
-// on routes that end in /groups
-router.route("/groups")
+    // on routes that end in /groups
+    router.route("/groups")
 
-    // get all groups (GET /$apiBaseUrl/groups)
-    .get(function(req, res) {
-        // querys for all groups and aggregate to one doc
-        Lecture.aggregate([ { $unwind: "$groups" }, { $group: { _id: "groups", groups: { $addToSet: "$groups" } } } ]).exec(function(err, groups) {
-            if (err) { res.status(500).send(err); }
-            res.status(200).json(groups[0].groups);
-            res.end();
+        // get all groups (GET /$apiBaseUrl/groups)
+        .get(function(req, res) {
+            // querys for all groups and aggregate to one doc
+            Lecture.aggregate([ { $unwind: "$groups" }, { $group: { _id: "groups", groups: { $addToSet: "$groups" } } } ]).exec(function(err, groups) {
+                if (err) { res.status(500).send(err); }
+                res.status(200).json(groups[0].groups);
+                res.end();
+            });
         });
-    });
+
+    // on routes that end in /groupLectures
+    router.route("/groupLectures")
+
+        // get all groups (GET /$apiBaseUrl/groupLectures)
+        .get(function(req, res) {
+            // querys for all groups & their lectures and aggregate
+            Lecture.aggregate( [ { $unwind: "$groups" }, { $group: { _id: "$groups", lectures: { $addToSet: "$lectureName" } } } ] ).exec(function(err, groups) {
+                if (err) { res.status(500).send(err); }
+                res.status(200).json(groups);
+                res.end();
+            });
+        });
 
 
 // register the router & the base url
