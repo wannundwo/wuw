@@ -265,7 +265,7 @@ router.route("/groupLectures")
     // get all groups (GET /$apiBaseUrl/groupLectures)
     .get(function(req, res) {
         // querys for all groups & their lectures and aggregate
-        Lecture.aggregate( [ { $unwind: "$groups" }, { $group: { _id: "$groups", lectures: { $addToSet: "$lectureName" } } } ] ).exec(function(err, groups) {
+        Lecture.aggregate( [ { $unwind: "$groups" }, { $group: { _id: "$groups", lectures: { $addToSet: "$lectureName" } } }, {$sort: { _id: 1}} ] ).exec(function(err, groups) {
             if (err) { res.status(500).send(err); }
             res.status(200).json(groups);
             res.end();
