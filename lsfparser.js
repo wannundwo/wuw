@@ -32,7 +32,7 @@ var parse = function(html, cb) {
 
 
     // parse each single lecture
-    async.each($("tr"), function(lectureLine, trcb) {
+    async.each($("tr").not(":first-child"), function(lectureLine, trcb) {
 
         // prepare docents
         var docents = [];
