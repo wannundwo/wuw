@@ -122,7 +122,7 @@ router.route("/lectures/:lecture_id")
             res.status(200).json(lecture);
             res.end();
         });
-    })
+    });
 
 
 // on routes that end in /deadlines
