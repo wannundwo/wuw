@@ -208,7 +208,13 @@ router.route("/upcomingLectures")
 
     // get upcoming lectures (GET /$apiBaseUrl/upcomingLectures)
     .get(function(req, res) {
-        Lecture.find({"endTime": {"$gte": new Date()}}).sort({startTime: 1}).exec(function(err, lectures) {
+
+        // today at 0:00
+        var today = new Date();
+        today.setHours(0,0,0,0);
+
+        // show all lectures for current day and later
+        Lecture.find({"endTime": {"$gte": today}}).sort({startTime: 1}).exec(function(err, lectures) {
             if (err) { res.status(500).send(err); }
             res.status(200).json(lectures);
             res.end();
