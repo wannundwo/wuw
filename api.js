@@ -226,13 +226,13 @@ router.route("/upcomingLectures")
 router.route("/lecturesForGroups")
 
     // get lectures for specific groups (GET /$apiBaseUrl/lecturesForGroups)
-    .get(function(req, res) {
-        var reqGroups = req.body.groups;
+    .post(function(req, res) {
+        var reqGroups = JSON.parse(req.body.groups);
 
         // check if we got a proper array
-        if(reqGroups && reqGroups.length > 0) {
+        if (reqGroups && reqGroups.length > 0) {
             Lecture.find({ groups: { $in: reqGroups }}).sort({startTime: 1}).exec(function(err, lectures) {
-                if (err) { res.status(500).send(err); }
+                if (err) { res.status(500).send(err + reqGroups);  }
                 res.status(200).json(lectures);
                 res.end();
             });
