@@ -130,7 +130,13 @@ router.route("/deadlines")
 
     // get all deadlines (GET /$apiBaseUrl/deadlines)
     .get(function(req, res) {
-        Deadline.find(function(err, deadlines) {
+
+        // get date of yesterday
+        var yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        // all "active" deadlines
+        Deadline.find({"deadline": {"$gte": yesterday}}).sort({deadline: 1}).exec(function(err, deadlines) {
             if (err) { res.status(500).send(err); }
             res.status(200).json(deadlines);
             res.end();
