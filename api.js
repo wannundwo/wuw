@@ -14,7 +14,7 @@ var fs = require("fs");
 
 // mongodb
 var mongohost="localhost:27017";
-var mongodb="wuw";
+var mongodb="wuwNew";
 var mongoConnection="mongodb://" + mongohost + "/" + mongodb;
 
 
@@ -93,24 +93,8 @@ router.route("/lectures")
             res.status(200).json(lectures);
             res.end();
         });
-    })
-
-    // get lectures for specific groups (POST /$apiBaseUrl/lectures)
-    .post(function(req, res) {
-        var reqGroups = req.body.groups;
-
-        // check if we got a proper array
-        if(reqGroups && reqGroups.length > 0) {
-            Lecture.find({ groups: { $in: reqGroups }}).sort({startTime: 1}).exec(function(err, lectures) {
-                if (err) { res.status(500).send(err); }
-                res.status(200).json(lectures);
-                res.end();
-            });
-        } else {
-            res.status(400).json({ error: "ohh that query looks wrong to me: " + reqGroups });
-            return;
-        }
     });
+
 
 // on routes that end in /lectures/:lecture_id
 router.route("/lectures/:lecture_id")
@@ -231,6 +215,28 @@ router.route("/upcomingLectures")
         });
     });
 
+
+// on routes that end in /lecturesForGroups
+router.route("/lecturesForGroups")
+
+    // get lectures for specific groups (GET /$apiBaseUrl/lecturesForGroups)
+    .get(function(req, res) {
+        var reqGroups = req.body.groups;
+
+        // check if we got a proper array
+        if(reqGroups && reqGroups.length > 0) {
+            Lecture.find({ groups: { $in: reqGroups }}).sort({startTime: 1}).exec(function(err, lectures) {
+                if (err) { res.status(500).send(err); }
+                res.status(200).json(lectures);
+                res.end();
+            });
+        } else {
+            res.status(400).json({ error: "ohh that query looks wrong to me: " + reqGroups });
+            return;
+        }
+    });
+
+
 // on routes that end in /rooms
 router.route("/rooms")
 
@@ -243,6 +249,7 @@ router.route("/rooms")
             res.end();
         });
     });
+
 
 // on routes that end in /freeRooms
 router.route("/freeRooms")
@@ -275,6 +282,7 @@ router.route("/freeRooms")
         });
     });
 
+
 // on routes that end in /groups
 router.route("/groups")
 
@@ -287,6 +295,7 @@ router.route("/groups")
             res.end();
         });
     });
+
 
 // on routes that end in /groupLectures
 router.route("/groupLectures")
