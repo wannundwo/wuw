@@ -12,6 +12,12 @@ var https = require("https");
 var fs = require("fs");
 
 
+// mongodb
+var mongohost="localhost:27017";
+var mongodb="wuw";
+var mongoConnection="mongodb://" + mongohost + "/" + mongodb;
+
+
 // ssl
 try {
     var use_ssl = true;
@@ -25,7 +31,7 @@ try {
         passphrase: pass.passphrase
     };
 } catch(err) {
-    if (err) { console.log("no ssl certificate present, falling back to http..."); use_ssl = false; }
+    if (err) { use_ssl = false; }
 }
 
 // create the express app & configure port
@@ -54,7 +60,7 @@ app.use(function(req, res, next) {
 
 
 // connect to mongodb
-mongoose.connect("mongodb://localhost:27017/wuw");
+mongoose.connect(mongoConnection);
 
 // create models from our schemas
 var Lecture = require("./model_lecture");
@@ -87,6 +93,23 @@ router.route("/lectures")
             res.status(200).json(lectures);
             res.end();
         });
+    })
+
+    // get lectures for specific groups (POST /$apiBaseUrl/lectures)
+    .post(function(req, res) {
+        var reqGroups = req.body.groups;
+
+        // check if we got a proper array
+        if(reqGroups && reqGroups.length > 0) {
+            Lecture.find({ groups: { $in: reqGroups }}).sort({startTime: 1}).exec(function(err, lectures) {
+                if (err) { res.status(500).send(err); }
+                res.status(200).json(lectures);
+                res.end();
+            });
+        } else {
+            res.status(400).json({ error: "ohh that query looks wrong to me: " + reqGroups });
+            return;
+        }
     });
 
 // on routes that end in /lectures/:lecture_id
@@ -99,7 +122,7 @@ router.route("/lectures/:lecture_id")
             res.status(200).json(lecture);
             res.end();
         });
-    });
+    })
 
 
 // on routes that end in /deadlines
@@ -276,14 +299,20 @@ router.route("/groupLectures")
 // register the router & the base url
 app.use(apiBaseUrl, router);
 
-// start the https server
+
+// start the server
+console.log("\n* starting the wuw api\n");
+console.log("  mongodb:  " + mongoConnection);
+console.log("  ssl:      " + use_ssl + " (no certificate found!)");
 if(use_ssl) {
     var server = https.createServer(https_options, app).listen(port);
-    console.log("magic happens at https://localhost:" + port + apiBaseUrl);
+    console.log("  url:      https://localhost:" + port + apiBaseUrl);
 } else {
     var server = app.listen(port);
-    console.log("magic happens at http://localhost:" + port + apiBaseUrl);
+    console.log("  url:      http://localhost:" + port + apiBaseUrl);
 }
+console.log();
+
 
 var startApi = function() {
     if (!server) {
@@ -294,6 +323,7 @@ var startApi = function() {
 var stopApi = function() {
     server.close();
 };
+
 
 // export functions
 module.exports = { startApi: startApi, stopApi: stopApi };
