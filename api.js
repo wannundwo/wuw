@@ -14,7 +14,7 @@ var fs = require("fs");
 
 // mongodb
 var mongohost="localhost:27017";
-var mongodb="wuwNew";
+var mongodb="wuw";
 var mongoConnection="mongodb://" + mongohost + "/" + mongodb;
 
 
