@@ -324,7 +324,7 @@ app.use(apiBaseUrl, router);
 // start the server
 console.log("\n* starting the wuw api\n");
 console.log("  mongodb:  " + mongoConnection);
-console.log("  ssl:      " + use_ssl;
+console.log("  ssl:      " + use_ssl);
 if(use_ssl) {
     var server = https.createServer(https_options, app).listen(port);
     console.log("  url:      https://localhost:" + port + apiBaseUrl);
