@@ -14,7 +14,7 @@ var fs = require("fs");
 
 // mongodb
 var mongohost="localhost:27017";
-var mongodb="wuw";
+var mongodb=process.env.WUWDB || "wuw";
 var mongoConnection="mongodb://" + mongohost + "/" + mongodb;
 
 
@@ -36,7 +36,7 @@ try {
 
 // create the express app & configure port
 var app = express();
-var port = process.env.PORT || 4342;
+var port = process.env.WUWPORT || 4342;
 
 // api version & url
 var apiVersion = 0;
