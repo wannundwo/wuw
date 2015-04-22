@@ -12,7 +12,7 @@ Use something like Postman (http://www.getpostman.com/) to test it
 
 ## Try the wuw-parser with this:  
 1. `npm install`  
-2. `node parser.js`
+2. `node parser_lsf.js`
 
 ## Unit Tests
 1. `npm install -g mocha`
