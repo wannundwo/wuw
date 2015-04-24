@@ -1,7 +1,7 @@
 "use strict";
 
 var assert = require('assert');
-var parser = require('../parser');
+var parser = require('../parser_lsf');
 var fs = require('fs');
 
 describe('Parser', function(){

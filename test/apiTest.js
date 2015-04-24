@@ -2,7 +2,7 @@
 
 var assert = require('assert');
 var api = require('../api');
-var parser = require('../parser');
+var parser = require('../parser_lsf');
 var fs = require('fs');
 var request = require('request');
 
