@@ -20,7 +20,7 @@ var hashCode = function(s){
 // parsing
 var parse = function(html, cb) {
     // create models from our schemas
-    var Lecture = require("./model_lecture");
+    var Lecture = require("./models/model_lecture");
 
     // init cheerio with our html
     var $ = cheerio.load(html);
@@ -97,7 +97,7 @@ var startParser = function() {
     }
 
     // create model from our schema (needed for drop)
-    var Lecture = require("./model_lecture");
+    var Lecture = require("./models/model_lecture");
 
     // create the urls to parse
     var urls = createUrls();

@@ -63,8 +63,8 @@ app.use(function(req, res, next) {
 mongoose.connect(mongoConnection);
 
 // create models from our schemas
-var Lecture = require("./model_lecture");
-var Deadline = require("./model_deadline");
+var Lecture = require("./models/model_lecture");
+var Deadline = require("./models/model_deadline");
 
 
 // routes

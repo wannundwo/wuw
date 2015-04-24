@@ -1,7 +1,7 @@
 "use strict";
 
 var mongoose = require("mongoose");
-var color = require("./color");
+var color = require("../color");
 
 // create mongodb schema for our lectures
 var DishSchema = new mongoose.Schema({
